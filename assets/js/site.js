@@ -28,7 +28,7 @@ function readMassEffectProgress() {
     const slot = saved?.slots?.[saved.activeSlot];
     if (!slot) return;
 
-    const completed = ['task', 'scan', 'dlc'].reduce((sum, key) => {
+    const completed = ['task', 'dlc'].reduce((sum, key) => {
       return sum + Object.values(slot[key] || {}).filter(Boolean).length;
     }, 0);
 

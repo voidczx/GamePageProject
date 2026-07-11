@@ -1,40 +1,60 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>风花雪月｜无继承超难最终速查手册</title>
-<link rel="stylesheet" href="../../assets/css/guide-shell.css">
-<style>
-:root{--bg:#0d1020;--card:#171b2f;--card2:#202743;--text:#eef2ff;--muted:#aab4dc;--line:#343d66;--accent:#8dc6ff;--gold:#ffd166;--green:#8ee6a7;--red:#ff7b7b;--purple:#d8c3ff}*{box-sizing:border-box}html{scroll-padding-top:86px}body{margin:0;background:linear-gradient(180deg,#090b15,#11162a 40%,#0d1020);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",Roboto,Arial,sans-serif;line-height:1.55}header{position:sticky;top:0;z-index:50;background:rgba(13,16,32,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}.wrap{max-width:1500px;margin:auto;padding:9px 12px}.top{display:flex;gap:10px;align-items:center}.title{font-size:17px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sub{font-size:12px;color:var(--muted)}#q{margin-left:auto;min-width:230px;background:#10152a;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:7px 10px}.tabs{display:flex;gap:6px;overflow-x:auto;margin-top:8px}.tab{border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:999px;padding:6px 12px;font-size:13px;cursor:pointer;white-space:nowrap}.tab.active{background:#18294a;border-color:var(--accent);box-shadow:0 0 0 2px rgba(141,198,255,.12) inset}.layout{display:grid;grid-template-columns:260px 1fr;gap:14px;max-width:1500px;margin:auto;padding:12px}.side{position:sticky;top:78px;align-self:start;max-height:calc(100vh - 96px);overflow:auto;background:rgba(23,27,47,.8);border:1px solid var(--line);border-radius:16px;padding:10px}.side b{display:block;margin:4px 0 8px}.side a{display:block;text-decoration:none;color:var(--muted);font-size:13px;padding:6px 8px;border-radius:8px}.side a:hover{background:var(--card2);color:var(--text)}.panel{display:none}.panel.active{display:block}.hero,.section,.card{border:1px solid var(--line);background:rgba(23,27,47,.78);border-radius:16px}.hero{padding:14px;margin-bottom:12px}.hero h1{font-size:22px;margin:0 0 6px}.section{padding:13px;margin-bottom:14px}.section h2{margin:0 0 10px;font-size:20px}.section h3{font-size:16px;margin:16px 0 8px;color:var(--gold)}.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.card{padding:12px}.card h3{margin:0 0 7px;font-size:17px;color:var(--accent)}.meta{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0}.tag{font-size:12px;border:1px solid var(--line);background:#10152a;color:var(--muted);border-radius:999px;padding:2px 7px}.good{color:var(--green)}.warn{color:var(--gold)}.bad{color:var(--red)}.purple{color:var(--purple)}.kv{display:grid;grid-template-columns:84px 1fr;gap:6px 9px;font-size:14px}.k{color:var(--muted)}ul{margin:6px 0 0 18px;padding:0}.note{color:var(--muted);font-size:13px}.jump{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.jump a{font-size:12px;color:var(--text);text-decoration:none;border:1px solid var(--line);background:#10152a;border-radius:999px;padding:4px 8px}.table{width:100%;border-collapse:collapse;font-size:13px}.table th,.table td{border-bottom:1px solid var(--line);padding:8px;text-align:left;vertical-align:top}.table th{position:sticky;top:76px;background:#151a2e;z-index:3}.compactList{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.mini{border:1px solid var(--line);background:#10152a;border-radius:12px;padding:9px}.mini b{color:var(--accent)}mark{background:#5b4a12;color:#fff;border-radius:3px;padding:0 2px}@media(max-width:860px){html{scroll-padding-top:82px}.wrap{padding:8px}.top{align-items:flex-start}.title{font-size:15px}.sub{display:none}#q{min-width:0;width:42%;font-size:13px}.layout{display:block;padding:8px}.side{position:static;max-height:none;margin-bottom:10px}.sideLinks{display:flex;overflow-x:auto;gap:6px}.side a{white-space:nowrap;border:1px solid var(--line);background:#10152a}.cards{grid-template-columns:1fr}.compactList{grid-template-columns:1fr}.table,.table thead,.table tbody,.table tr,.table th,.table td{display:block}.table thead{display:none}.table tr{border:1px solid var(--line);background:#10152a;border-radius:12px;margin:8px 0;padding:6px}.table td{border:0;padding:5px 6px}.table td:before{content:attr(data-label);display:block;color:var(--muted);font-size:12px}.hero h1{font-size:18px}.section{padding:10px}.card{padding:10px}.kv{grid-template-columns:78px 1fr}.tabs{padding-bottom:2px}.tab{padding:6px 10px}}
-</style></head><body><a class="guide-home-link" href="../../" aria-label="返回攻略库">← 攻略库</a>
-<header><div class="wrap"><div class="top"><div><div class="title">风花雪月｜无继承超难最终速查手册</div><div class="sub">手机卡片 / 桌面表格 / 快速导航 / 无勾选无备注 / DLC 通关后可用灰狼</div></div><input id="q" placeholder="搜索角色、月份、战技、外传…"></div><nav class="tabs" id="tabs"></nav></div></header>
-<div class="layout"><aside class="side"><b>本页快速跳转</b><div id="sideLinks" class="sideLinks"></div></aside><main id="app"></main></div>
-<script>
-const routeBase='初级 Lv5：战士/修道士/剑客；中级 Lv10：飞马/盗贼/佣兵/弓箭手/法师；上级 Lv20：飞龙骑士/狙击手/术师/主教/刀剑将领；最上级 Lv30：飞龙领主/战争统领/墓志铭/英勇骑士/格莫瑞。考试条件看目标兵种技能，超难建议提前 1–2 月补技能。';
-const chars={
-'通用主角':[ ['贝雷特/贝雷丝 Byleth','全线','自动','青狮/金鹿必须重点培养','Lv5剑客→Lv10盗贼/佣兵→Lv20飞龙骑士或刀剑将领→Lv30飞龙领主；保守可启蒙者','剑术 D+ 起步；飞龙需斧 C、飞行 C 起考，Lv30 飞龙领主斧 A/飞行 A；启蒙者剧情自动解锁','风薙：剑术 A；破天/天帝之霸剑：持天帝之剑；剑术等级提供剑术 Prowess；飞行 C+ 警戒姿态，A+ 警戒姿态+','命中+20：弓箭手精通；鬼神一击：土匪精通；飞燕一击：飞马骑士精通；剑必杀/剑术 Lv；指挥 D/C/B 装高命中骑士团','天帝之剑：主线获得并强化；勇者剑/银剑+ 商店与锻造；倭刀/必杀剑用于必杀；行军戒指/闪避戒指优先','杰拉尔特佣兵团、赛罗司圣骑士团、歌剧团义勇兵、王国/同盟飞龙队；指挥从 E→C/B 尽早练','主角等级过低会拖累全线；第 10–12 章前至少完成一个强力中级精通。'],
-['贝雷特/贝雷丝｜青狮线','青狮','自动','与帝弥托利一起承担 EP/收割','推荐飞龙领主；若资源紧张，可启蒙者+剑系终盘','飞龙线：斧 C、飞行 C→斧 B、飞行 B；指挥 C 以上','风薙剑 A 解决反击；天帝之霸剑远程补刀；曲射可弓 D 临时补命中','命中+20、鬼神一击、飞燕一击、警戒姿态+、剑术/斧术 Prowess','天帝之剑用于关键击杀，不要普通清杂；飞龙配回避/命中骑士团','王国飞龙队/歌剧团/杰拉尔特佣兵团；终盘按命中与回避选择','青狮中后期高压，主角不要只当副官；需要能飞、能破阵、能救场。'],
-['贝雷特/贝雷丝｜金鹿线','金鹿','自动','补足库罗德外第二飞行核心','飞龙领主最稳；也可启蒙者保留信仰辅助','同青狮；金鹿弓兵多，主角更适合补前排与机动','风薙、天帝之霸剑；弓 D 曲射可早期补刀；指挥提升计策命中','命中+20、鬼神一击、飞燕一击、警戒姿态+、移动+1 可选','天帝之剑、必杀剑+、勇者剑；后期需要特效武器针对魔兽/重甲','同盟飞龙队、杰拉尔特佣兵团、歌剧团；低魅力时选高命中计策','与库罗德双飞可以显著降低地图压力，特别适合救村民/抢宝箱。'] ],
-'黑鹫':[ ['艾黛尔贾特 Edelgard','黑鹫','不可常规挖角','核心物理/专属路线','战士→土匪→飞龙骑士→飞龙领主；皇帝线可玩但机动差','土匪斧 C；飞龙斧 C/飞行 C；飞龙领主斧 A/飞行 A','狂岚：专属战技，阿姆尔装备时；斧术等级获斧战技','鬼神一击、命中+20、警戒姿态+、斧术 Prowess、重量-3 可选','阿姆尔：红花线后期；银斧+/勇者斧/必杀斧；命中戒指','帝国重装队、帝国飞龙队、高命中计策团','狂岚能连续行动，终盘 Boss Rush 核心。'],['休伯特 Hubert','黑鹫','不可常规挖角','暗法/魔法炮台','修道士→术师→暗术师/术士→暗骑士','理学、枪、骑术；暗骑士需枪 C、理学 B+、骑术 A','暗魔法随理学等级；Miasma/Death 等；冰枪不是其核心','魔神一击：术师精通；理学 Lv；黑/暗魔法射程+1 来自装备/杖','卡aduceus/Thyrsus；魔法杖；暗魔法考试证需死神骑士掉落/盗取','魔法命中/魔攻骑士团，帝国魔法队','红花限定强力法师，非红花离队。'],['费尔迪南特 Ferdinand','黑鹫','重甲+技巧','闪避坦/连击枪','士兵→土匪/骑兵→圣骑士→飞龙/英勇骑士','枪、斧、飞行/骑术；连击需枪 A','连击：枪术 A；曲射：弓 D；破甲等通用枪战技','鬼神一击、命中+20、警戒姿态+、枪术 Lv、回避相关','勇者枪/银枪+；命中戒指；闪避盾/回避装备','飞龙队/回避骑士团；个人技满血+命中回避','个人技强，但超难需维持满血。'],['林哈尔特 Linhardt','黑鹫','魔力+理学','治疗/传送','修道士→牧师→主教→主教/神圣骑士','信仰 B Warp；理学辅助','传送：信仰 A；物理护盾等按信仰表','治疗+10：牧师精通；白魔法次数x2：主教职业；信仰 Lv','治疗杖、魔法杖；行军戒指可给传送手','恢复/辅助骑士团','不用追求击杀，确保 Warp 次数。'],['佩托拉 Petra','黑鹫','技巧+骑术','飞行闪避/刺客','战士→土匪/飞马→飞龙骑士→飞龙领主','斧、飞行；飞马需枪 D/飞行 D','曲射弓 D；斧/剑战技按技能等级；高暴击适合必杀武器','鬼神一击、飞燕一击、命中+20、警戒姿态+、斧术/剑术','必杀斧/倭刀/必杀弓；闪避戒指','飞龙队/回避骑士团','高速高闪，适合拉怪与收割。'],['多洛缇雅 Dorothea','黑鹫','魅力+指挥','舞者/长程支援','修道士→术师→舞者；或术士','舞者需第9章白鹭杯，高魅力；理学信仰辅助','Meteor：理学 A；Physic：信仰 C；魅惑剑：剑术','魔神一击；理学 Lv；舞者剑回避+20 精通/职业价值','魔法杖；雷霆剑；舞者装备行军/回避','歌剧团义勇兵非常适合计策辅助','Meteor 可提供全图支援连携。'] ],
-'青狮':[ ['帝弥托利 Dimitri','青狮','不可常规挖角','最强物理核心/复仇反击','士兵→土匪/弓箭手→圣骑士/英勇骑士；也可高机动飞龙','枪 A 优先；指挥 A 后成型；骑术/斧视路线','连击：枪 A；个人高力配勇者枪；专属枪战技后期','鬼神一击、命中+20、指挥待伏组合（指挥等级获得）、枪术 Lv','勇者枪、银枪+、阿莱德巴尔；命中戒指','王国骑士团、狮鹫/飞龙队；高命中计策','中后期靠待伏可清图，但需要控血与命中。'],['杜笃 Dedue','青狮','不可常规挖角','前期盾/复仇枪','士兵→土匪→重甲/堡垒；可战争统领','枪 C+ 复仇；斧/格斗视路线','复仇：枪 C+；低血高伤；破甲斧通用','鬼神一击、HP+5、斧术/枪术、命中+20 可补','训练枪+/铁枪+ 用复仇；盾牌前期抗线','高防御骑士团/王国重装队','青狮第 13 章前注意外传与剧情离队回归条件。'],['菲利克斯 Felix','青狮','速度+剑术','高速物理/拳王/狙击','剑客→土匪/弓箭手→格斗家/狙击手→战争统领/刀剑','剑/格斗/弓；战争统领需斧 A、格斗 A','曲射弓 D；猎箭齐发：狙击手精通；剑战技按剑术','鬼神一击、命中+20、格斗回避、拳术 Lv、必杀','铁拳套+/银拳套；必杀弓；倭刀','前期个人技不带骑士团加伤，后期仍要带高命中骑士团','输出强但防脆，超难不要裸冲。'],['希尔凡 Sylvain','青狮','魅力+理学；女主可无条件','连击枪/飞龙','士兵→土匪→骑兵/飞龙→飞龙领主/圣骑士','枪 A 连击；斧飞行或骑术','连击：枪 A；破裂枪专属可用遗产','鬼神一击、命中+20、枪术、警戒姿态+','破裂枪：西提司/洛廉兹相关外传奖励；勇者枪','王国飞龙/骑兵队','早期易招募，是其他线优质补强。'],['英谷莉特 Ingrid','青狮','敏捷+飞行','飞马/闪避飞龙','士兵→飞马→飞龙/圣骑士→飞龙领主/圣天马','枪、飞行；圣天马需枪 A、飞行 B+','冰枪：枪术 C+；曲射弓 D','飞燕一击、警戒姿态+、命中+20、枪术 Lv','卢恩：英谷莉特/多洛缇雅外传；勇者枪/银枪+','高回避飞行骑士团','力量偏低，需鬼神一击和锻造武器补伤。'],['梅尔赛德司 Mercedes','青狮','魔力+弓','治疗/远程恢复','修道士→牧师→主教→格莫瑞/主教','信仰为主；格莫瑞需理学 A、信仰 A','Physic：信仰 C；Fortify：信仰 A','治疗+10、白魔法次数x2、魔神一击可选','治疗杖、魔法杖','恢复骑士团','全队容错核心，不必抢击杀。'],['雅妮特 Annette','青狮','魔力+信仰','应援/魔法斧','修道士→术师→术士/暗骑士；可飞龙魔法斧','理学/斧/指挥；魔法斧路线需斧与飞行',' Rally 系随指挥/个人成长；魔法战技碎尘可遗产','魔神一击、理学、指挥、命中+20 可选','Crusher：雅妮特/吉尔伯特外传；魔法斧/雷斧','魔攻骑士团/高命中计策','应援在超难前中期价值很高。'],['亚修 Ashe','青狮','魅力+枪','工具人/狙击手','战士→弓箭手→狙击手','弓为主；狙击手弓 A','曲射：弓 D；猎箭齐发：狙击手精通','命中+20、鬼神一击、弓术、弓必杀','必杀弓/银弓+；开锁个人技省钥匙','弓兵骑士团','强度一般，但工具性好。'] ],
-'金鹿':[ ['库罗德 Claude','金鹿','不可常规挖角','飞行弓/机动核心','弓箭手→土匪/飞龙→专属飞龙领主路线','弓、飞行、斧；专属职业剧情解锁','围攻/专属弓战技；曲射弓 D；弓高阶战技','命中+20、鬼神一击、警戒姿态+、弓术 Lv','失败者之弓/专属弓；必杀弓/银弓+','同盟飞龙队/弓兵队','全线最省心机动核心，配主角双飞。'],['希尔妲 Hilda','金鹿','魅力+斧；黑鹫通常限制','飞龙物理','战士→土匪/飞马→飞龙骑士→飞龙领主','斧、飞行；枪 D 可飞马','斧战技按斧等级；曲射弓 D','鬼神一击、飞燕一击、命中+20、警戒姿态+','弗莱库格：希尔妲/西提司外传；勇者斧/必杀斧','飞龙队/高物攻骑士团','高力高魅，可做计策与击杀核心。'],['洛廉兹 Lorenz','金鹿','魅力+理学','外传工具/魔法骑','修道士→术师→术士/暗骑士','理学、枪、骑术','冰枪：枪术 C+；黑魔法随理学','魔神一击、理学、命中+20','Thyrsus：洛廉兹外传奖励，常给更强法师','魔攻骑士团','本人中规中矩，但外传奖励全游戏顶级。'],['拉斐尔 Raphael','金鹿','力量+重甲','格斗/副坦','战士→土匪/格斗家→勇士/战争统领','斧、格斗；重甲可补防','格斗战技按格斗等级；猛烈铁拳职业路线','鬼神一击、命中+20、格斗、斧术','银拳套/必杀拳套','高物攻骑士团','速度低，靠拳套与勇者类多段输出。'],['伊古纳兹 Ignatz','金鹿','技巧+指挥','命中辅助/狙击','战士→弓箭手→狙击手','弓、指挥','曲射弓 D；破甲射击等弓术；猎箭齐发精通','命中+20叠个人技、鬼神一击、弓术、指挥','必杀弓/长弓；命中戒指可省给他人','计策命中高，适合控制','个人技命中+20，超难稳定性很好。'],['莉丝缇亚 Lysithea','金鹿','魔力+信仰','传送/爆破法师','修道士→术师→术士→格莫瑞/女武神(DLC)','理学、信仰；格莫瑞双 A','Warp：信仰 B；Dark Spikes：理学 B；Luna 等暗魔法','魔神一击、理学、信仰、黑/暗魔法射程装备','Thyrsus：洛廉兹外传；Caduceus；魔法杖','魔攻骑士团','全游戏最强法核之一，优先资源。'],['玛莉安奴 Marianne','金鹿','魔力+骑术','治疗/舞者/魔法剑','修道士→牧师→主教/舞者/暗骑士','信仰、理学、剑/骑术视路线','Physic 信仰 C；冰枪枪术 C+；魔法剑相关','治疗+10、魔神一击、信仰/理学、剑回避舞者可选','布鲁托刚格：玛莉安奴外传；魔法剑/雷霆剑','辅助/魔攻骑士团','可治疗也可舞者，外传需她在队。'],['雷欧妮 Leonie','金鹿','力量+枪','弓骑/连击枪','士兵→土匪/弓箭手→圣骑士/狙击手→弓骑士','枪 A、弓、骑术','连击：枪 A；曲射弓 D；近距离连射弓 A（角色特有）','鬼神一击、命中+20、弓术/枪术、移动+1 可选','勇者弓/必杀弓；勇者枪','弓骑/骑兵骑士团','成长稳定，是金鹿物理主力。'] ],
-'DLC/教会':[ ['尤里 Yuri','灰狼','DLC 通关后深渊招募','速度工具/舞者/诡术师','盗贼→刺客/诡术师；也可舞者','剑、信仰、指挥','风薙剑 A；曲射弓 D；诡术师职业战技','命中+20、剑术、移动+1/特殊舞蹈视路线','多罗米锁环：尤里外传；倭刀/雷霆剑','高命中辅助骑士团','戒指/锁环工具性极强。'],['巴尔塔札尔 Balthus','灰狼','DLC 深渊','拳王/坦','战士→土匪/格斗家→战争统领','斧、格斗','格斗战技；低血个人技补强','鬼神一击、命中+20、格斗、HP+5','瓦玖拉：巴尔塔札尔/哈琵外传','物攻骑士团','适合低血爆发，但要防法伤。'],['康斯坦洁 Constance','灰狼','DLC 深渊','高魔力法师','修道士→术师→术士/暗飞马(DLC)→格莫瑞','理学、信仰、飞行可选','Bolting 理学 A；Rescue 信仰 B','魔神一击、理学、飞行警戒可选','魔法杖/射程杖；达克飞马机动','魔攻骑士团','长程魔法提供连携与远程压制。'],['哈琵 Hapi','灰狼','DLC 深渊','魔兽克星/传送','修道士→术师→女武神/格莫瑞','理学、信仰、骑术','Warp 信仰 A；怪物吸引个人技；暗魔法','魔神一击、理学、信仰、命中+20 可选','瓦玖拉外传奖励；魔法杖','魔攻/辅助骑士团','对魔兽图很舒服，但要保护。'],['西提司 Seteth','教会','剧情加入','飞龙副核','加入后飞龙骑士→飞龙领主','斧、枪、飞行','连击：枪 A；飞龙机动','鬼神一击可补精通，命中+20，警戒姿态+','阿萨勒之枪/银枪+；勇者枪','飞龙队','加入即战力，高难非常好用。'],['芙莲 Flayn','教会','剧情加入','救援/辅助','牧师→主教/舞者','信仰、理学','Rescue 信仰 B；Fortify 信仰 A','治疗+10、白魔法次数、魔神一击可选','卡aduceus：西提司/芙莲外传','辅助骑士团','有救援但机动和生存要保护。'],['卡特琳 Catherine','教会','等级/章节限制','前中期剑圣','剑圣即战力→刺客/飞龙可转','剑、斧/飞行视重练','雷霆剑/英雄遗产多段；剑战技','剑术、命中+20可补、鬼神一击可补','雷霆：自带遗产；倭刀/必杀剑','高物攻骑士团','早招强，后期需补技能。'],['萨米亚 Shamir','教会','章节后可招','狙击手即战力','狙击手→弓骑士或留狙击手','弓 A；骑术可选','猎箭齐发：狙击手精通；曲射','命中+20自带路线容易，鬼神一击可补','必杀弓/银弓+','弓兵骑士团','低投入高回报，推荐招。'] ]
-};
-const months=[['4月','选学级；无继承超难前期命中最缺。主角训练弓 D 取曲射，核心物理规划土匪/弓箭手精通。'],['5月','优先指导武器命中与中级考试条件。每周探索用于吃饭补干劲，种植刷速度/力量/魅力。'],['6月','解锁更多外传前的准备；开始挖角关键角色。女主可无条件招希尔凡。'],['7月','死神骑士图谨慎，不必硬杀；若要暗魔法考试证，用高伤/骑士团/偷盗规划。'],['8月','中级职业成型期：弓箭手命中+20、土匪鬼神、术师魔神、飞马飞燕。'],['9月','白鹭杯前准备舞者候选，魅力不足用茶会/练习。'],['10月','外传陆续开启，优先会过期且奖励强的：洛廉兹、英谷莉特、菲利克斯等。'],['11月','确保核心角色 Lv20 上级考试；飞龙/狙击/主教开始承担主力。'],['12月','第 12 章前做路线确认、外传清理、装备修理；红花分歧需满足艾黛尔贾特支援/陪同条件。'],['1月','第二部开始后第 13 章常是超难墙点，出战角色不要断养。'],['2月','后半外传通常要求相关角色都在队，奖励强但敌人等级高，先侦察再打。'],['3月','最上级考试与终盘武器锻造：飞龙领主、格莫瑞、弓骑士、战争统领等定型。'],['4月以后','终盘以计策破阵、长程连携、传送/救援、飞行机动处理地图目标，不恋战。']];
-const paralogues=[['弱者的战斗','杜笃','青狮','第一部','杜笃在队；青狮限定','杜笃后续剧情与奖励相关，青狮务必做。'],['真正的骑士道','菲利克斯','青狮','第一部','菲利克斯在队','奖励盾/资源，难点是保护 NPC 与分兵。'],['传说中的存在','洛廉兹','金鹿','第一部','洛廉兹在队；可挖角后开启','奖励 Thyrsus，法师全线顶级装备，优先做。'],['被诅咒的遗产','英谷莉特/多洛缇雅','青狮/黑鹫','第一部','通常相关角色之一在队可开启','奖励卢恩；注意飞兵与保护目标。'],['油断大敌','拉斐尔/伊古纳兹','金鹿','第一部','相关角色在队','奖励经验与资源，难度中等。'],['不共戴天','希尔妲/西提司','金鹿/教会','第二部','后半通常需两者都在队；路线限制','奖励弗莱库格，希尔妲核心遗产。'],['抹消英雄遗产','玛莉安奴','金鹿','第二部','玛莉安奴在队','奖励布鲁托刚格；魔兽较多，带破甲计策。'],['湖水传说','林哈尔特/蕾欧妮','黑鹫/金鹿','第二部','两者均在队','奖励弓/资源；魔兽高压，准备破盾。'],['异境天空','尤里/康斯坦洁','灰狼','DLC','DLC 通关并招募相关角色','奖励多罗米锁环等，机动工具价值极高。'],['金鹿之守护者','巴尔塔札尔/哈琵','灰狼','DLC','DLC 通关并招募相关角色','奖励瓦玖拉，拳系强装备。'],['不朽之守护者','西提司/芙莲','教会','第一部','二人在队','奖励卡aduceus 法杖，法师射程/恢复辅助好用。'],['海之见闻','萨米亚/阿罗伊斯','教会','第二部','二人在队','奖励资源和骑士团，敌人分布需稳扎稳打。']];
-const sortie=[['前期总原则','敌方速度与伤害高，不追求全员均养；集中 8–10 人。用曲射、计策、连携、地形拉怪。'],['职业精通','物理优先土匪鬼神一击、弓箭手命中+20；女性高速拿飞马飞燕；法师拿术师魔神一击；治疗拿牧师。'],['计策','超难计策是控场核心。魅力低的角色装高命中骑士团；破魔兽盾前先看范围和连携。'],['第 13 章','无继承超难常见卡点。第一部结束前确保自动出场角色有等级、武器、骑士团和伤害手段。'],['外传','先做强奖励、会过期、低难窗口的外传。进入前检查胜利条件，很多图不是全灭最优。'],['飞行队','飞行无视地形但怕弓，警戒姿态+和高回避骑士团成型后可拉怪。'],['法师','射程杖、长程魔法和 Warp/Rescue 比面板更关键。保护站位，避免被增援骑兵秒杀。'],['装备','铁+/训练+性价比高；银+补伤；勇者系解决追击；必杀系配高技/必杀骑士团；遗产留给关键击杀。']];
-const mechanics=[['战技获得方式','角色技能等级获得：如弓 D 曲射、枪 A 连击（部分角色）、剑 A 风薙（部分角色）。职业精通获得：如狙击手猎箭齐发。英雄遗产/专属武器附带：如阿姆尔狂岚、天帝之剑破天/天帝之霸剑。'],['特技获得方式','技能等级：各武器 Prowess、指挥、飞行 C+/A+ 警戒姿态。职业精通：土匪鬼神、弓箭手命中+20、术师魔神、飞马飞燕、佣兵待伏、勇士愤怒。'],['挖角判定','学生挖角通常看主角某项能力值 + 某技能等级；支援等级越高，门槛越低。部分角色有路线限制或不可挖。'],['DLC 灰狼','通关煤暗之章后，主线可在深渊招募尤里、巴尔塔札尔、康斯坦洁、哈琵；他们有自己的外传与装备。'],['外传触发','第一部外传多为相关角色之一在队即可；第二部多人外传常要求相关角色都在队，且有路线/月份限制。']];
-const panels=[['overview','总览'],['byleth','主角'],['be','黑鹫'],['bl','青狮'],['gd','金鹿'],['dlc','DLC/教会'],['months','月份节点'],['paralogues','外传'],['sortie','出击'],['mechanics','机制速查']];
-function card(c){return `<article class="card searchable" id="${c[0]}"><h3>${c[0]}</h3><div class="meta"><span class="tag">${c[1]}</span><span class="tag">挖角：${c[2]}</span><span class="tag warn">${c[3]}</span></div><div class="kv"><div class="k">职业路线</div><div>${c[4]}</div><div class="k">转职条件</div><div>${c[5]}</div><div class="k">战技获取</div><div>${c[6]}</div><div class="k">特技获取</div><div>${c[7]}</div><div class="k">装备获取</div><div>${c[8]}</div><div class="k">骑士团</div><div>${c[9]}</div><div class="k">注意</div><div>${c[10]}</div></div></article>`}
-function charPanel(id,title,key){let list=chars[key]; return `<section class="panel" id="p-${id}"><div class="hero"><h1>${title}</h1><p class="note">无继承超难优先级以“命中、机动、职业精通、关键战技获得时间”为核心。手机端为卡片，桌面端双列。</p><div class="jump">${list.map(x=>`<a href="#${x[0]}">${x[0].split(' ')[0]}</a>`).join('')}</div></div><div class="cards">${list.map(card).join('')}</div></section>`}
-function tablePanel(id,title,heads,rows){return `<section class="panel" id="p-${id}"><div class="hero"><h1>${title}</h1></div><div class="section"><table class="table"><thead><tr>${heads.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr class="searchable">${r.map((x,i)=>`<td data-label="${heads[i]}">${x}</td>`).join('')}</tr>`).join('')}</tbody></table></div></section>`}
-let app=document.getElementById('app');
-app.innerHTML=`<section class="panel active" id="p-overview"><div class="hero"><h1>使用方式</h1><p>这版删除勾选/备注/存档，优先做“手机可读的高密度速查”。顶部搜索会过滤当前页条目；左侧/横向导航可直达角色、月份、外传和机制。</p></div><div class="section"><h2>无继承超难核心原则</h2><div class="compactList">${sortie.concat(mechanics).map(x=>`<div class="mini searchable"><b>${x[0]}</b><br>${x[1]}</div>`).join('')}</div></div></section>`+
-charPanel('byleth','主角培养｜青狮 & 金鹿补全','通用主角')+charPanel('be','黑鹫角色培养','黑鹫')+charPanel('bl','青狮角色培养','青狮')+charPanel('gd','金鹿角色培养','金鹿')+charPanel('dlc','DLC / 教会角色培养','DLC/教会')+
-tablePanel('months','关键月份节点',['月份','节点与注意'],months)+tablePanel('paralogues','角色单人/多人外传',['外传','角色','原学级','时期','触发条件','奖励/注意'],paralogues)+tablePanel('sortie','主线/支线出击注意事项',['主题','注意事项'],sortie)+tablePanel('mechanics','战技/特技/挖角机制速查',['主题','说明'],mechanics);
-let tabs=document.getElementById('tabs'); tabs.innerHTML=panels.map((p,i)=>`<button class="tab ${i==0?'active':''}" data-p="${p[0]}">${p[1]}</button>`).join('');
-function activate(id){document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.p==id));document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id=='p-'+id));buildSide(id);document.getElementById('q').value='';filter('');window.scrollTo({top:0,behavior:'smooth'})}
-tabs.onclick=e=>{if(e.target.dataset.p)activate(e.target.dataset.p)};
-function buildSide(id){let p=document.getElementById('p-'+id), links=[]; p.querySelectorAll('h1,h2,h3').forEach((h,i)=>{if(!h.id)h.id=id+'-h-'+i; links.push(`<a href="#${h.id}">${h.textContent}</a>`)}); document.getElementById('sideLinks').innerHTML=links.join('')||'<span class="note">无子项</span>'}buildSide('overview');
-function filter(q){q=q.trim().toLowerCase();document.querySelectorAll('.panel.active .searchable').forEach(el=>{el.style.display=!q||el.textContent.toLowerCase().includes(q)?'':'none'})}
-document.getElementById('q').oninput=e=>filter(e.target.value);
-</script>
-</body></html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111310">
+  <meta name="description" content="火焰纹章 风花雪月无继承超难作战台：章节地图、角色培养、外传关联与路线规划。">
+  <title>风花雪月 | 无继承超难作战台</title>
+  <link rel="stylesheet" href="../../assets/css/guide-shell.css">
+  <link rel="stylesheet" href="style.css">
+  <script src="data.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="guide-home-link" href="../../" aria-label="返回攻略库">← 攻略库</a>
+
+  <header class="app-header">
+    <div class="brand-block">
+      <span class="brand-code">FE3H / MADDENING</span>
+      <strong>无继承超难作战台</strong>
+    </div>
+    <label class="global-search" for="global-search">
+      <span>全局搜索</span>
+      <input id="global-search" type="search" placeholder="角色、战技、外传、章节…" autocomplete="off">
+    </label>
+  </header>
+
+  <div class="app-shell">
+    <aside class="control-rail">
+      <section class="control-group" aria-labelledby="route-label">
+        <h2 id="route-label">当前路线</h2>
+        <div class="route-switch" id="route-switch" role="group" aria-label="选择路线"></div>
+      </section>
+
+      <section class="control-group" aria-labelledby="chapter-label">
+        <label id="chapter-label" for="chapter-select">当前章节</label>
+        <select id="chapter-select"></select>
+      </section>
+
+      <nav class="view-nav" id="view-nav" aria-label="页面视图">
+        <button class="active" data-view="command">本月作战</button>
+        <button data-view="battles">战役地图</button>
+        <button data-view="roster">角色编成</button>
+        <button data-view="paralogues">外传关系</button>
+        <button data-view="routes">路线节点</button>
+        <button data-view="mechanics">机制速查</button>
+      </nav>
+
+      <section class="source-note">
+        <span>DATA BASELINE</span>
+        <p>Triangle Attack / FE Datamine；Maddening 数据与策略建议分栏显示，头像来自对应角色数据页。</p>
+      </section>
+    </aside>
+
+    <main id="app" tabindex="-1"></main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
