@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0c0d0f">
+  <meta name="description" content="高难度游戏攻略与任务速查手册。">
+  <title>Field Manuals | 游戏攻略库</title>
+  <link rel="stylesheet" href="assets/css/site.css">
+  <script src="assets/js/site.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="Field Manuals 首页">
+      <span class="brand-mark" aria-hidden="true">FM</span>
+      <span>FIELD MANUALS</span>
+    </a>
+    <div class="site-meta" aria-label="站点状态">
+      <span class="status-dot" aria-hidden="true"></span>
+      <span>2 份攻略</span>
+      <span class="meta-divider" aria-hidden="true"></span>
+      <span>简体中文</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="library-heading" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow">TACTICAL REFERENCE / 01</p>
+        <h1 id="page-title">游戏攻略库</h1>
+        <p class="lede">面向高难度流程的任务顺序、培养路线与关键节点速查。</p>
+      </div>
+      <label class="search-field" for="guide-search">
+        <span>搜索攻略</span>
+        <span class="search-control">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+          <input id="guide-search" type="search" autocomplete="off" placeholder="游戏、平台或内容">
+        </span>
+      </label>
+    </section>
+
+    <section class="guide-section" aria-labelledby="guides-title">
+      <div class="section-bar">
+        <h2 id="guides-title">全部手册</h2>
+        <span id="guide-count" aria-live="polite">2 / 2</span>
+      </div>
+
+      <div class="guide-grid" id="guide-grid">
+        <article class="guide-card" data-search="mass effect 3 legendary edition me3 质量效应 终极版 任务 星图 扫描 dlc 多存档">
+          <a class="cover-link" href="games/mass-effect-3/" data-guide="mass-effect-3" aria-label="打开 Mass Effect 3 终极版攻略">
+            <img src="assets/images/mass-effect-3-cover.webp" alt="深空星图、行星与侦察飞船组成的科幻任务场景" width="1200" height="800">
+            <span class="cover-index">MANUAL 01</span>
+          </a>
+          <div class="guide-body">
+            <div class="guide-kicker"><span>SCI-FI RPG</span><span>任务追踪</span></div>
+            <h3><a href="games/mass-effect-3/" data-guide="mass-effect-3">Mass Effect 3</a></h3>
+            <p>终极版高可信任务扫描攻略</p>
+            <ul class="feature-list" aria-label="攻略内容">
+              <li>任务顺序</li><li>星图扫描</li><li>DLC 窗口</li><li>本地多存档</li>
+            </ul>
+            <div class="guide-footer">
+              <span class="progress-status" id="me3-progress">尚未记录进度</span>
+              <a class="open-link" href="games/mass-effect-3/" data-guide="mass-effect-3">打开手册 <span aria-hidden="true">↗</span></a>
+            </div>
+          </div>
+        </article>
+
+        <article class="guide-card" data-search="fire emblem three houses fe3h 风花雪月 无继承 超难 maddening 角色 培养 外传 月份 战技">
+          <a class="cover-link" href="games/fire-emblem-three-houses/" data-guide="fire-emblem-three-houses" aria-label="打开 Fire Emblem: Three Houses 超难攻略">
+            <img src="assets/images/fire-emblem-three-houses-cover.webp" alt="古老学院中的战术地图、棋子、长剑与远处塔楼" width="1200" height="800">
+            <span class="cover-index">MANUAL 02</span>
+          </a>
+          <div class="guide-body">
+            <div class="guide-kicker"><span>TACTICAL RPG</span><span>培养速查</span></div>
+            <h3><a href="games/fire-emblem-three-houses/" data-guide="fire-emblem-three-houses">Fire Emblem: Three Houses</a></h3>
+            <p>无继承超难最终速查手册</p>
+            <ul class="feature-list" aria-label="攻略内容">
+              <li>角色培养</li><li>月份节点</li><li>外传条件</li><li>机制速查</li>
+            </ul>
+            <div class="guide-footer">
+              <span class="progress-status">高密度只读速查</span>
+              <a class="open-link" href="games/fire-emblem-three-houses/" data-guide="fire-emblem-three-houses">打开手册 <span aria-hidden="true">↗</span></a>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <p class="empty-state" id="empty-state" hidden>没有匹配的攻略。</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>FIELD MANUALS</span>
+    <span>静态发布 · 本地保存进度</span>
+  </footer>
+</body>
+</html>
