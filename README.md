@@ -14,6 +14,7 @@
 │   ├── images/
 │   └── js/
 └── games/
+    ├── cyberpunk-2077/
     ├── fire-emblem-three-houses/
     └── mass-effect-3/
 ```
@@ -42,4 +43,5 @@
 - 修改主页：`index.html`、`assets/css/site.css`、`assets/js/site.js`
 - 修改 ME3 攻略：`games/mass-effect-3/index.html`
 - 修改风花雪月攻略：`games/fire-emblem-three-houses/index.html`、`data.js`、`app.js`、`style.css`
+- 修改赛博朋克 2077 攻略：`games/cyberpunk-2077/index.html`、`data.js`、`app.js`、`style.css`
 - 替换封面时保持 `1200 × 800` 或相同比例，并优先使用 WebP

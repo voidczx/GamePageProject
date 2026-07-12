@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#11130f">
+  <meta name="description" content="赛博朋克 2077 与往日之影强力流派攻略：关键装备地图、义体定位与 2.0+ 加点模拟器。">
+  <title>赛博朋克 2077 | 夜之城构筑终端</title>
+  <link rel="stylesheet" href="../../assets/css/guide-shell.css">
+  <link rel="stylesheet" href="style.css">
+  <script src="data.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="guide-home-link" href="../../" aria-label="返回攻略库">← 攻略库</a>
+
+  <header class="cp-header">
+    <a class="cp-brand" href="#top" aria-label="返回页面顶部">
+      <span class="cp-brand-mark" aria-hidden="true">77</span>
+      <span>
+        <strong>夜之城构筑终端</strong>
+        <small>CYBERPUNK 2077 / PHANTOM LIBERTY</small>
+      </span>
+    </a>
+    <div class="version-stamp" aria-label="数据版本">
+      <span>2.0+ PERK SYSTEM</span>
+      <span>LV.60 / DLC</span>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="intro-band" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow">FIELD MANUAL / 03</p>
+        <h1 id="page-title">赛博朋克 2077</h1>
+        <p>以实战循环组织装备、义体与专长。每个流派都能直接切换、定位关键物品，并按当前等级验证下一点是否真的点得出来。</p>
+      </div>
+      <dl class="intro-facts">
+        <div><dt>等级上限</dt><dd>60</dd></div>
+        <div><dt>单属性上限</dt><dd>20</dd></div>
+        <div><dt>遗物点上限</dt><dd>15</dd></div>
+      </dl>
+    </section>
+
+    <nav class="build-tabs" id="build-tabs" aria-label="强力流派"></nav>
+
+    <section class="build-overview" id="build-overview" aria-live="polite"></section>
+
+    <section class="map-band" id="map-section" aria-labelledby="map-title">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">NIGHT CITY / ACQUISITION</p>
+          <h2 id="map-title">关键装备与义体地图</h2>
+        </div>
+        <div class="map-head-controls">
+          <div class="map-layer-switch" id="map-layer-switch" role="group" aria-label="地图图层"></div>
+          <div class="map-filters" id="map-filters" aria-label="地图标记筛选"></div>
+          <output class="map-progress" id="map-progress" aria-live="polite"></output>
+        </div>
+      </div>
+
+      <div class="map-layout">
+        <div class="map-stage">
+          <div class="map-toolbar" aria-label="地图缩放控制">
+            <button type="button" data-map-action="zoom-out" aria-label="缩小地图" title="缩小">−</button>
+            <output id="map-zoom" aria-live="polite">100%</output>
+            <button type="button" data-map-action="zoom-in" aria-label="放大地图" title="放大">+</button>
+            <button type="button" data-map-action="reset" aria-label="重置地图视图" title="重置视图">⌖</button>
+          </div>
+          <div class="map-viewport" id="map-viewport" tabindex="0" aria-label="夜之城关键物品交互地图">
+            <div class="map-scene" id="map-scene">
+              <img class="map-image" id="map-image" alt="">
+              <div class="map-markers" id="map-markers"></div>
+            </div>
+          </div>
+          <a class="map-attribution" id="map-attribution" target="_blank" rel="noreferrer"></a>
+        </div>
+
+        <aside class="map-selection" id="map-selection" aria-live="polite"></aside>
+      </div>
+    </section>
+
+    <section class="loadout-band" id="loadout-section" aria-labelledby="loadout-title">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">LOADOUT / DETAILS</p>
+          <h2 id="loadout-title">获取路线与用途</h2>
+        </div>
+        <span class="section-count" id="loadout-count"></span>
+      </div>
+      <div class="loadout-list" id="loadout-list"></div>
+    </section>
+
+    <section class="simulator-band" id="simulator" aria-labelledby="simulator-title">
+      <div class="section-head simulator-head">
+        <div>
+          <p class="eyebrow">BUILD LAB / 2.0+</p>
+          <h2 id="simulator-title">等级与加点模拟器</h2>
+        </div>
+        <button class="text-action" type="button" id="reset-profile">重置当前流派</button>
+      </div>
+
+      <div class="level-console">
+        <div class="level-stepper">
+          <span>当前等级</span>
+          <button type="button" data-level-step="-1" aria-label="降低一级" title="降低一级">−</button>
+          <output id="level-output">1</output>
+          <button type="button" data-level-step="1" aria-label="提升一级" title="提升一级">+</button>
+        </div>
+        <input id="level-range" type="range" min="1" max="60" value="1" aria-label="当前等级">
+        <label class="switch-control">
+          <input id="dlc-toggle" type="checkbox" checked>
+          <span>含《往日之影》</span>
+        </label>
+      </div>
+
+      <div class="budget-strip" id="budget-strip" aria-live="polite"></div>
+
+      <div class="simulator-grid">
+        <section class="attribute-panel" aria-labelledby="attribute-title">
+          <div class="panel-title">
+            <div><span class="section-code">ATTRIBUTES</span><h3 id="attribute-title">属性分配</h3></div>
+            <span id="attribute-budget"></span>
+          </div>
+          <div class="attribute-list" id="attribute-list"></div>
+        </section>
+
+        <section class="bonus-panel" aria-labelledby="bonus-title">
+          <div class="panel-title">
+            <div><span class="section-code">EXTRA POINTS</span><h3 id="bonus-title">额外点数</h3></div>
+          </div>
+          <div id="bonus-controls"></div>
+          <p class="rule-note" id="point-rule-note"></p>
+        </section>
+      </div>
+
+      <section class="perk-panel" aria-labelledby="perk-title">
+        <div class="panel-title">
+          <div><span class="section-code">PERK QUEUE</span><h3 id="perk-title">当前流派推荐专长</h3></div>
+          <span id="perk-budget"></span>
+        </div>
+        <div class="perk-list" id="perk-list"></div>
+      </section>
+
+      <section class="relic-panel" id="relic-panel" aria-labelledby="relic-title">
+        <div class="panel-title">
+          <div><span class="section-code">PHANTOM LIBERTY</span><h3 id="relic-title">遗物专长路线</h3></div>
+          <span id="relic-budget"></span>
+        </div>
+        <div class="relic-list" id="relic-list"></div>
+      </section>
+    </section>
+
+    <section class="source-band" aria-labelledby="source-title">
+      <div>
+        <p class="eyebrow">DATA BASELINE</p>
+        <h2 id="source-title">规则与位置来源</h2>
+      </div>
+      <div class="source-links" id="source-links"></div>
+      <p class="fan-disclaimer">本页为非官方粉丝作品，未获 CD PROJEKT RED 批准或背书。游戏地图与相关名称归其各自权利人所有。</p>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
