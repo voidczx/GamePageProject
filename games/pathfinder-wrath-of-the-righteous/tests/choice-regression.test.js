@@ -59,7 +59,7 @@ function makeRuntime(seed = {}) {
     requestAnimationFrame: (callback) => callback()
   };
   const context = vm.createContext({ window, document, localStorage, console, clearTimeout, setTimeout, requestAnimationFrame: window.requestAnimationFrame, Blob, URL, FileReader: class {}, structuredClone });
-  ["data.js", "expanded-data.js", "choice-data.js", "mythic-data.js", "generated/wotr-2.7.0x.site.js", "owlcat-runtime.js"].forEach((file) => vm.runInContext(fs.readFileSync(path.join(root, file), "utf8"), context, { filename: file }));
+  ["data.js", "expanded-data.js", "choice-data.js", "mythic-data.js", "generated/wotr-2.7.0x.site-core.js", "generated/wotr-2.7.0x.site-definitions.js", "owlcat-runtime.js"].forEach((file) => vm.runInContext(fs.readFileSync(path.join(root, file), "utf8"), context, { filename: file }));
   const exports = [
     "ui", "store", "elements", "currentSave", "currentCharacter", "currentCompanion", "normalPrefix", "mythicPrefix",
     "featSlotsForStep", "featureSlotsForStep", "activeFeatureSlotsForStep", "resolvedLevelCursor", "currentStepComplete", "commitLevel",

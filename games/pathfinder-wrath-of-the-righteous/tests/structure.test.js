@@ -6,6 +6,12 @@ const path = require("path");
 const vm = require("vm");
 
 const root = path.resolve(__dirname, "..");
+const deployedDataChunks = ["generated/wotr-2.7.0x.site-core.js", "generated/wotr-2.7.0x.site-definitions.js"];
+deployedDataChunks.forEach((file) => {
+  assert.ok(fs.statSync(path.join(root, file)).size < 25 * 1024 * 1024, `${file} must stay below Cloudflare Pages' 25 MiB asset limit`);
+});
+const deployedHtml = fs.readFileSync(path.join(root, "index.html"), "utf8");
+deployedDataChunks.forEach((file) => assert.ok(deployedHtml.includes(file.replace("generated/", "generated/")), `${file} must be loaded by the production page`));
 
 class FakeClassList {
   add() {}
@@ -64,7 +70,7 @@ function makeRuntime(seed = {}) {
     requestAnimationFrame: (callback) => callback()
   };
   const context = vm.createContext({ window, document, localStorage, console, clearTimeout, setTimeout, requestAnimationFrame: window.requestAnimationFrame, Blob, URL, FileReader: class {}, structuredClone });
-  ["data.js", "expanded-data.js", "choice-data.js", "mythic-data.js", "generated/wotr-2.7.0x.site.js", "owlcat-runtime.js"].forEach((file) => vm.runInContext(fs.readFileSync(path.join(root, file), "utf8"), context, { filename: file }));
+  ["data.js", "expanded-data.js", "choice-data.js", "mythic-data.js", "generated/wotr-2.7.0x.site-core.js", "generated/wotr-2.7.0x.site-definitions.js", "owlcat-runtime.js"].forEach((file) => vm.runInContext(fs.readFileSync(path.join(root, file), "utf8"), context, { filename: file }));
   const appSource = fs.readFileSync(path.join(root, "app.js"), "utf8").replace(/\}\)\(\);\s*$/, "window.__WOTR_TEST__ = { ui, store, elements, currentCharacter, currentCompanion, normalPrefix, featSlotsForStep, featureSlotsForStep, resolvedLevelCursor, renderLevelStage, renderBackgroundStage, renderRaceStage, renderFaithStage, renderFeats, renderPaths, activeCatalogItems, parameterOptionsForItem, nativeRequirementResults, isEligible, classChoices, commitLevel, commitMythic, rebuildCharacter, parameterLabel, sheetWarnings };\n})();");
   vm.runInContext(appSource, context, { filename: "app.js" });
   return { context, window, elements, api: window.__WOTR_TEST__, data: window.WOTR_DATA, storage };

@@ -6,7 +6,8 @@
     "expanded-data.js",
     "choice-data.js",
     "mythic-data.js",
-    "generated/wotr-2.7.0x.site.js",
+    "generated/wotr-2.7.0x.site-core.js",
+    "generated/wotr-2.7.0x.site-definitions.js",
     "owlcat-runtime.js"
   ],
   "targetGameBuild": {
