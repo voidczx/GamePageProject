@@ -61,14 +61,15 @@ function makeRuntime(seed = {}) {
   const context = vm.createContext({ window, document, localStorage, console, clearTimeout, setTimeout, requestAnimationFrame: window.requestAnimationFrame, Blob, URL, FileReader: class {}, structuredClone });
   ["data.js", "expanded-data.js", "choice-data.js", "mythic-data.js", "generated/wotr-2.7.0x.site-core.js", "generated/wotr-2.7.0x.site-definitions.js", "owlcat-runtime.js"].forEach((file) => vm.runInContext(fs.readFileSync(path.join(root, file), "utf8"), context, { filename: file }));
   const exports = [
-    "ui", "store", "elements", "currentSave", "currentCharacter", "currentCompanion", "normalPrefix", "mythicPrefix",
+    "ui", "store", "elements", "currentSave", "currentCharacter", "currentCompanion", "normalPrefix", "normalCandidate", "mythicPrefix",
     "featSlotsForStep", "featureSlotsForStep", "activeFeatureSlotsForStep", "resolvedLevelCursor", "currentStepComplete", "commitLevel",
     "rollbackLevel", "truncateLevel", "commitMythic", "truncateMythic", "rebuildCharacter", "parameterComplete",
     "isParameterizedChoiceEligible", "sheetWarnings", "renderBackgroundStage", "renderRaceStage", "renderFaithStage",
     "pathPickSlots", "activePathPickSlots", "pathChoiceIssues", "mythicProjection", "featureChoiceComplete", "featureNestedControl", "withCurrentFeatureChoices",
     "nativeRequirementResults", "itemRequirementResults", "parameterOptionsForItem", "sneakDice", "effectiveAttributes",
     "raceAbilityRequired", "activeRaceFeatureGuids", "backgroundEffectProfile", "proficiencyProfile", "storyStatus", "petProfile",
-    "pathStoryEligible", "pathStoryRequirementResults", "projectCharacterSources", "characterEffectProfile", "catalogItemEffectProfile", "normalizeComponentEffects", "sourceFullStatValue", "staticStatValue", "overallStats"
+    "pathStoryEligible", "pathStoryRequirementResults", "projectCharacterSources", "characterEffectProfile", "catalogItemEffectProfile", "normalizeComponentEffects", "sourceFullStatValue", "staticStatValue", "overallStats",
+    "skillPointBudgetForStep", "skillRankIssues", "skillProfile", "allocatedSkillPoints"
   ];
   const appSource = fs.readFileSync(path.join(root, "app.js"), "utf8").replace(/\}\)\(\);\s*$/, `window.__WOTR_CHOICE_TEST__ = { ${exports.join(", ")} };\n})();`);
   vm.runInContext(appSource, context, { filename: "app.js" });
@@ -91,6 +92,21 @@ function setLevelDraft(api, classId, selections, featureSelections = []) {
   api.ui.nextArchetype = null;
   api.ui.nextFeatChoices = Object.fromEntries(featSlots.map((slot, index) => [slot.id, selections[index]]));
   api.ui.nextFeatureChoices = Object.fromEntries(featureSlots.map((slot, index) => [slot.id, { optionId: featureSelections[index], params: {} }]));
+  const candidate = api.normalCandidate(prefix, classId, null, api.ui.nextAbilityIncrease);
+  const step = candidate.normalSteps.at(-1);
+  step.featChoices = featSlots.map((slot, index) => ({ slotId: slot.id, source: slot.source, ...selections[index] }));
+  step.featureChoices = featureSlots.map((slot, index) => ({ slotId: slot.id, source: slot.source, groupId: slot.groupId, optionId: featureSelections[index], params: {} }));
+  api.rebuildCharacter(candidate);
+  const budget = api.skillPointBudgetForStep(prefix, candidate).total;
+  const ranks = {};
+  let remaining = budget;
+  api.skillProfile(candidate).sort((left, right) => Number(right.classSkill) - Number(left.classSkill)).forEach((skill) => {
+    const amount = Math.min(remaining, candidate.normalSteps.length - (prefix.skills[skill.id] || 0));
+    if (amount > 0) ranks[skill.id] = amount;
+    remaining -= amount;
+  });
+  assert.equal(remaining, 0, "skill budget should fit the installed skill rank caps");
+  api.ui.nextSkillRanks = ranks;
   api.ui.nextDomains = [];
   api.ui.nextKnownSpells = [];
   api.commitLevel();
@@ -303,10 +319,16 @@ setLevelDraft(api, "fighter", [
   { id: "weapon-focus", params: { weapon: "longsword" } }
 ]);
 assert.deepEqual(commander.normalSteps[0].featChoices.map((choice) => choice.source), levelOneSources, "slot source must persist with each choice");
+assert.equal(api.allocatedSkillPoints(commander.normalSteps[0].skillRanks), 4, "human fighter level one must persist its installed 2 + INT 1 + racial 1 skill budget");
+const athletics = api.skillProfile(commander).find((skill) => skill.id === "athletics");
+assert.equal(athletics.classSkill, true);
+assert.equal(athletics.total, athletics.ranks + athletics.abilityModifier + 3 + athletics.permanentBonus, "trained class skills must show the +3 check bonus separately from ranks");
 
 api.ui.levelCursor = null;
 setLevelDraft(api, "fighter", [{ id: "weapon-focus", params: { weapon: "rapier" } }]);
 assert.equal(commander.normalSteps.length, 2);
+const levelTwoSkillRanks = { ...commander.normalSteps[1].skillRanks };
+const beforeRollbackSkills = { ...commander.skills };
 
 api.ui.levelCursor = 0;
 setLevelDraft(api, "fighter", [
@@ -322,6 +344,29 @@ assert.ok(!commander.featChoices.some((choice) => choice.params.weapon === "long
 api.rollbackLevel();
 assert.equal(commander.normalSteps.length, 1);
 assert.ok(!commander.featChoices.some((choice) => choice.params.weapon === "rapier"), "rollback must remove the last step from derived state");
+Object.entries(levelTwoSkillRanks).forEach(([id, value]) => assert.equal(commander.skills[id], beforeRollbackSkills[id] - value, "rollback must remove skill ranks acquired by the removed level"));
+
+const budgetRuntime = makeRuntime();
+const budgetApi = budgetRuntime.api;
+const budgetCharacter = budgetApi.currentCharacter();
+budgetCharacter.normalSteps = [];
+budgetCharacter.raceAbility = "str";
+budgetApi.rebuildCharacter(budgetCharacter);
+let budgetPrefix = budgetApi.normalPrefix(budgetCharacter, 0);
+let fighterCandidate = budgetApi.normalCandidate(budgetPrefix, "fighter", null, null);
+assert.equal(budgetApi.skillPointBudgetForStep(budgetPrefix, fighterCandidate).total, 4);
+budgetCharacter.attributes.int = 16;
+budgetApi.rebuildCharacter(budgetCharacter);
+budgetPrefix = budgetApi.normalPrefix(budgetCharacter, 0);
+fighterCandidate = budgetApi.normalCandidate(budgetPrefix, "fighter", null, null);
+assert.equal(budgetApi.skillPointBudgetForStep(budgetPrefix, fighterCandidate).total, 6, "the current-level budget must use the character's actual Intelligence modifier");
+const rogueCandidate = budgetApi.normalCandidate(budgetPrefix, "rogue", null, null);
+assert.equal(budgetApi.skillPointBudgetForStep(budgetPrefix, rogueCandidate).total, 9, "the installed class SkillPoints value must replace the old one-point-per-level presentation");
+const fastLearner = budgetRuntime.data.feats.find((feat) => feat.sourceInternalName === "FastLearner");
+assert.ok(fastLearner, "installed Fast Learner blueprint must be available");
+fighterCandidate.normalSteps[0].featChoices = [{ slotId: "test:fast-learner", source: "general", id: fastLearner.id, params: {} }];
+budgetApi.rebuildCharacter(fighterCandidate);
+assert.equal(budgetApi.skillPointBudgetForStep(budgetPrefix, fighterCandidate).total, 7, "AddSkillPointPerCharacterLevel feats must change the same-level budget");
 
 const cavalierRuntime = makeRuntime();
 const cavalierApi = cavalierRuntime.api;

@@ -71,7 +71,7 @@ function makeRuntime(seed = {}) {
   };
   const context = vm.createContext({ window, document, localStorage, console, clearTimeout, setTimeout, requestAnimationFrame: window.requestAnimationFrame, Blob, URL, FileReader: class {}, structuredClone });
   ["data.js", "expanded-data.js", "choice-data.js", "mythic-data.js", "generated/wotr-2.7.0x.site-core.js", "generated/wotr-2.7.0x.site-definitions.js", "owlcat-runtime.js"].forEach((file) => vm.runInContext(fs.readFileSync(path.join(root, file), "utf8"), context, { filename: file }));
-  const appSource = fs.readFileSync(path.join(root, "app.js"), "utf8").replace(/\}\)\(\);\s*$/, "window.__WOTR_TEST__ = { ui, store, elements, currentCharacter, currentCompanion, normalPrefix, featSlotsForStep, featureSlotsForStep, resolvedLevelCursor, renderLevelStage, renderBackgroundStage, renderRaceStage, renderFaithStage, renderFeats, renderPaths, activeCatalogItems, parameterOptionsForItem, nativeRequirementResults, isEligible, classChoices, commitLevel, commitMythic, rebuildCharacter, parameterLabel, sheetWarnings };\n})();");
+  const appSource = fs.readFileSync(path.join(root, "app.js"), "utf8").replace(/\}\)\(\);\s*$/, "window.__WOTR_TEST__ = { ui, store, elements, currentCharacter, currentCompanion, normalPrefix, normalCandidate, featSlotsForStep, featureSlotsForStep, resolvedLevelCursor, renderLevelStage, renderBackgroundStage, renderRaceStage, renderFaithStage, renderFeats, renderPaths, activeCatalogItems, parameterOptionsForItem, nativeRequirementResults, isEligible, classChoices, commitLevel, commitMythic, rebuildCharacter, parameterLabel, sheetWarnings, skillPointBudgetForStep, skillProfile };\n})();");
   vm.runInContext(appSource, context, { filename: "app.js" });
   return { context, window, elements, api: window.__WOTR_TEST__, data: window.WOTR_DATA, storage };
 }
@@ -216,6 +216,11 @@ api.ui.nextFeatChoices = {
   [fighterSlots[2].id]: { id: "weapon-focus", params: { weapon: "longsword" } }
 };
 api.ui.nextFeats = ["power-attack", "dodge", "weapon-focus"];
+const skillCandidate = api.normalCandidate(prefix, "fighter", null, null);
+skillCandidate.normalSteps[0].featChoices = fighterSlots.map((slot) => ({ slotId: slot.id, source: slot.source, ...api.ui.nextFeatChoices[slot.id] }));
+api.rebuildCharacter(skillCandidate);
+assert.deepEqual(api.skillPointBudgetForStep(prefix, skillCandidate), { rawTotal: 4, total: 4, classBase: 2, intelligence: 12, intelligenceModifier: 1, sourceBonus: 1, legacyCredit: 0 }, "人类战士一级应按安装版职业 2 + 智力调整 1 + 人类熟练 1 获得 4 点");
+api.ui.nextSkillRanks = { athletics: 1, mobility: 1, world: 1, persuasion: 1 };
 api.commitLevel();
 assert.equal(commander.normalSteps[0].featChoices.length, 3);
 assert.equal(commander.normalSteps[0].featChoices[2].params.weapon, "longsword");
@@ -239,6 +244,10 @@ api.renderRaceStage();
 assert.match(api.elements.workspace.innerHTML, /子种族 \/ 血统/);
 assert.match(api.elements.workspace.innerHTML, /data-heritage="human-base"/);
 assert.match(api.elements.workspace.innerHTML, /data-race-ability="str"/);
+assert.match(api.elements.workspace.innerHTML, /data-card-expand/, "long creation cards must expose a separate mobile description toggle");
+const responsiveCss = fs.readFileSync(path.join(root, "style.css"), "utf8");
+assert.match(responsiveCss, /@media \(max-width: 800px\)[\s\S]*-webkit-line-clamp: 4/);
+assert.match(responsiveCss, /choice-card-wrap\.expanded[\s\S]*-webkit-line-clamp: unset/);
 api.renderFaithStage();
 assert.match(api.elements.workspace.innerHTML, /阵营与信仰/);
 assert.match(api.elements.workspace.innerHTML, /无神论/);
@@ -262,9 +271,10 @@ api.commitMythic();
 assert.equal(commander.mythicSteps[1].commonChoice.params.nestedParams.energy, "cold");
 assert.match(api.parameterLabel(data.mythic.find((item) => item.id === "extra-mythic-ability"), commander.mythicSteps[1].commonChoice.params), /寒冷/);
 
-const stored = JSON.parse(runtime.storage.get("WOTR_BUILD_ARCHIVE_V3"));
-assert.equal(stored.version, 3);
+const stored = JSON.parse(runtime.storage.get("WOTR_BUILD_ARCHIVE_V4"));
+assert.equal(stored.version, 4);
 assert.equal(stored.slots[stored.activeSlot].characters.commander.normalSteps[0].featChoices[2].params.weapon, "longsword");
+assert.equal(stored.slots[stored.activeSlot].characters.commander.normalSteps[0].skillRanks.athletics, 1);
 
 const legacy = makeRuntime({
   WOTR_BUILD_ARCHIVE_V2: JSON.stringify({
@@ -273,8 +283,19 @@ const legacy = makeRuntime({
     slots: { legacy: { name: "旧存档", activeCharacter: "commander", characters: { commander: { race: "human", background: "leader", alignment: "LG", levels: ["fighter"], feats: ["power-attack"], mythicRank: 1, mythicChoices: ["last-stand"] } } } }
   })
 });
-assert.equal(legacy.api.store.version, 3);
+assert.equal(legacy.api.store.version, 4);
 assert.ok(Array.isArray(legacy.api.currentCharacter().normalSteps[0].featChoices));
 assert.equal(legacy.api.currentCharacter().legacyManual.feats[0], "power-attack", "无法证明取得等级的 V1/V2 聚合专长应无损保留");
+
+const skillLegacy = makeRuntime({
+  WOTR_BUILD_ARCHIVE_V3: JSON.stringify({
+    version: 3,
+    activeSlot: "skill-legacy",
+    slots: { "skill-legacy": { name: "技能旧存档", activeCharacter: "commander", characters: { commander: { race: "human", heritage: "human-base", background: "leader", alignment: "N", attributes: { str: 16, dex: 14, con: 14, int: 12, wis: 10, cha: 10 }, skills: { athletics: 1 }, normalSteps: [{ level: 1, classId: "fighter", featChoices: [], featureChoices: [], domainIds: [], knownSpellIds: [] }] } } } }
+  })
+});
+const migratedSkillCharacter = skillLegacy.api.currentCharacter();
+assert.equal(migratedSkillCharacter.legacySkillRanks.athletics, 1, "V3 flat skill ranks must be preserved without inventing an acquisition level");
+assert.equal(skillLegacy.api.skillPointBudgetForStep(skillLegacy.api.normalPrefix(migratedSkillCharacter, 0), skillLegacy.api.normalPrefix(migratedSkillCharacter, 1)).legacyCredit, 1, "legacy ranks must consume the earliest unplaced budget instead of creating extra ranks");
 
 console.log("structure.test.js: all assertions passed");

@@ -2,8 +2,8 @@
   "use strict";
 
   const DATA = window.WOTR_DATA;
-  const STORAGE_KEY = "WOTR_BUILD_ARCHIVE_V3";
-  const LEGACY_STORAGE_KEYS = ["WOTR_BUILD_ARCHIVE_V2", "WOTR_BUILD_ARCHIVE_V1"];
+  const STORAGE_KEY = "WOTR_BUILD_ARCHIVE_V4";
+  const LEGACY_STORAGE_KEYS = ["WOTR_BUILD_ARCHIVE_V3", "WOTR_BUILD_ARCHIVE_V2", "WOTR_BUILD_ARCHIVE_V1"];
   const pointCosts = { 7: -4, 8: -2, 9: -1, 10: 0, 11: 1, 12: 2, 13: 3, 14: 5, 15: 7, 16: 10, 17: 13, 18: 17 };
   const classById = new Map(DATA.classes.map((item) => [item.id, item]));
   const featById = new Map(DATA.feats.map((item) => [item.id, item]));
@@ -87,6 +87,7 @@
     nextFeatChoices: {},
     nextFeatureChoices: {},
     nextDomainChoices: {},
+    nextSkillRanks: {},
     nextAbilityIncrease: null,
     nextMythic: null,
     nextMythicParams: {},
@@ -114,6 +115,10 @@
 
   function escapeHtml(value) {
     return String(value ?? "").replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]);
+  }
+
+  function longChoiceCard({ selected = false, disabled = false, dataAttributes = "", code = "", title = "", text = "", footer = "" }) {
+    return `<article class="choice-card-wrap ${selected ? "selected" : ""}"><button type="button" class="choice-card ${selected ? "selected" : ""}" ${dataAttributes} ${disabled ? "disabled" : ""}><span class="choice-code">${escapeHtml(code)}</span><h3>${escapeHtml(title)}</h3><p>${escapeHtml(text)}</p>${footer}</button>${text ? `<button type="button" class="card-expand" data-card-expand aria-expanded="false">展开说明</button>` : ""}</article>`;
   }
 
   function stableParams(params = {}) {
@@ -250,6 +255,19 @@
     return values;
   }
 
+  function emptySkillRanks() {
+    return Object.fromEntries(DATA.skills.map((skill) => [skill.id, 0]));
+  }
+
+  function sanitizeSkillRanks(raw) {
+    const result = emptySkillRanks();
+    DATA.skills.forEach(({ id }) => {
+      const value = Number(raw?.[id]);
+      if (Number.isFinite(value)) result[id] = Math.max(0, Math.min(40, Math.floor(value)));
+    });
+    return result;
+  }
+
   function defaultFeats(companion) {
     const presets = {
       commander: ["power-attack"], seelah: ["dodge", "shield-bash"], camellia: ["weapon-finesse"],
@@ -272,6 +290,7 @@
       featIds: [],
       featChoices: [],
       featureChoices: [],
+      skillRanks: {},
       domainChoices: [],
       domainIds: [],
       knownSpellIds: [],
@@ -333,6 +352,7 @@
         abilityIncrease: (index + 1) % 4 === 0 && abilityById.has(step.abilityIncrease) ? step.abilityIncrease : null,
         featChoices,
         featureChoices,
+        skillRanks: sanitizeSkillRanks(step.skillRanks),
         featIds: [...new Set(featChoices.map((choice) => choice.id))],
         domainChoices,
         domainIds: [...new Set(domainChoices.map((choice) => choice.domainId))],
@@ -386,6 +406,9 @@
     character.levels = character.normalSteps.map((step) => step.classId);
     character.featChoices = character.normalSteps.flatMap((step) => step.featChoices);
     character.featureChoices = character.normalSteps.flatMap((step) => step.featureChoices);
+    character.legacySkillRanks = sanitizeSkillRanks(character.legacySkillRanks);
+    character.skills = sanitizeSkillRanks(character.legacySkillRanks);
+    character.normalSteps.forEach((step) => DATA.skills.forEach(({ id }) => { character.skills[id] += step.skillRanks[id] || 0; }));
     character.domainChoices = character.normalSteps.flatMap((step) => step.domainChoices || []);
     character.feats = [...new Set([...character.legacyManual.feats, ...character.normalSteps.flatMap((step) => step.featIds)])];
     character.mythicRank = character.mythicSteps.length;
@@ -410,7 +433,8 @@
       alignment: companion.align || "N",
       deity: null,
       attributes,
-      skills: defaultSkills(companion),
+      skills: emptySkillRanks(),
+      legacySkillRanks: companion.id === "commander" ? emptySkillRanks() : defaultSkills(companion),
       normalSteps: makePresetSteps(companion),
       mythicSteps: [],
       legacyManual: { feats: [], mythic: [] },
@@ -428,7 +452,7 @@
 
   function defaultStore() {
     const id = uid();
-    return { version: 3, activeSlot: id, slots: { [id]: makeSave() } };
+    return { version: 4, activeSlot: id, slots: { [id]: makeSave() } };
   }
 
   function normalizeCharacter(saved, companion) {
@@ -449,11 +473,8 @@
       const value = Number(saved.attributes?.[id]);
       if (Number.isFinite(value)) attributes[id] = Math.max(id === "con" && companion.group === "path" && companion.path === "lich" ? 0 : 1, Math.min(30, value));
     });
-    const skills = { ...base.skills };
-    DATA.skills.forEach(({ id }) => {
-      const value = Number(saved.skills?.[id]);
-      if (Number.isFinite(value)) skills[id] = Math.max(0, Math.min(40, Math.floor(value)));
-    });
+    const hasStepSkillRanks = Array.isArray(saved.normalSteps) && saved.normalSteps.some((step) => step?.skillRanks && typeof step.skillRanks === "object");
+    const legacySkillRanks = sanitizeSkillRanks(saved.legacySkillRanks || (!hasStepSkillRanks ? saved.skills : null) || base.legacySkillRanks);
     let normalSteps;
     let legacyManual = { feats: [], mythic: [] };
     if (Array.isArray(saved.normalSteps)) {
@@ -461,7 +482,7 @@
       legacyManual = saved.legacyManual && typeof saved.legacyManual === "object" ? saved.legacyManual : legacyManual;
     } else {
       const levels = Array.isArray(saved.levels) ? saved.levels.filter((id) => classById.has(id) || id === "dragon").slice(0, 40) : base.levels;
-      normalSteps = levels.map((classId, index) => ({ level: index + 1, classId, archetypeId: null, featIds: [], featChoices: [], featureChoices: [], domainChoices: [], domainIds: [], knownSpellIds: [], source: "legacy", locked: false }));
+      normalSteps = levels.map((classId, index) => ({ level: index + 1, classId, archetypeId: null, featIds: [], featChoices: [], featureChoices: [], skillRanks: {}, domainChoices: [], domainIds: [], knownSpellIds: [], source: "legacy", locked: false }));
       legacyManual.feats = Array.isArray(saved.feats) ? saved.feats : [];
     }
     let mythicSteps;
@@ -480,7 +501,8 @@
       ...saved,
       id: companion.id,
       attributes,
-      skills,
+      skills: emptySkillRanks(),
+      legacySkillRanks,
       normalSteps,
       mythicSteps,
       legacyManual,
@@ -523,7 +545,7 @@
       Object.entries(parsed.slots).slice(0, 24).forEach(([id, saved], index) => { slots[id] = normalizeSave(saved, `本地存档 ${index + 1}`); });
       const ids = Object.keys(slots);
       if (!ids.length) return defaultStore();
-      return { version: 3, activeSlot: slots[parsed.activeSlot] ? parsed.activeSlot : ids[0], slots };
+      return { version: 4, activeSlot: slots[parsed.activeSlot] ? parsed.activeSlot : ids[0], slots };
     } catch {
       return defaultStore();
     }
@@ -548,18 +570,20 @@
   function normalPrefix(character, count) {
     return rebuildCharacter({
       ...character,
-      normalSteps: character.normalSteps.slice(0, count).map((step) => ({ ...step, featChoices: step.featChoices.map((choice) => ({ ...choice, params: stableParams(choice.params) })), featureChoices: step.featureChoices.map((choice) => ({ ...choice, params: stableParams(choice.params) })), domainChoices: (step.domainChoices || []).map((choice) => ({ ...choice })) })),
+      normalSteps: character.normalSteps.slice(0, count).map((step) => ({ ...step, featChoices: step.featChoices.map((choice) => ({ ...choice, params: stableParams(choice.params) })), featureChoices: step.featureChoices.map((choice) => ({ ...choice, params: stableParams(choice.params) })), skillRanks: sanitizeSkillRanks(step.skillRanks), domainChoices: (step.domainChoices || []).map((choice) => ({ ...choice })) })),
       mythicSteps: character.mythicSteps.map((step) => ({ ...step, pathPicks: [...step.pathPicks] })),
-      legacyManual: { feats: [...character.legacyManual.feats], mythic: [...character.legacyManual.mythic] }
+      legacyManual: { feats: [...character.legacyManual.feats], mythic: [...character.legacyManual.mythic] },
+      legacySkillRanks: sanitizeSkillRanks(character.legacySkillRanks)
     });
   }
 
   function normalCandidate(prefix, classId, archetypeId = null, abilityIncrease = null) {
     return rebuildCharacter({
       ...prefix,
-      normalSteps: [...prefix.normalSteps, { level: prefix.normalSteps.length + 1, classId, archetypeId, abilityIncrease: abilityById.has(abilityIncrease) ? abilityIncrease : null, featIds: [], featChoices: [], featureChoices: [], domainChoices: [], domainIds: [], knownSpellIds: [], source: "user", locked: false }],
+      normalSteps: [...prefix.normalSteps, { level: prefix.normalSteps.length + 1, classId, archetypeId, abilityIncrease: abilityById.has(abilityIncrease) ? abilityIncrease : null, featIds: [], featChoices: [], featureChoices: [], skillRanks: {}, domainChoices: [], domainIds: [], knownSpellIds: [], source: "user", locked: false }],
       mythicSteps: prefix.mythicSteps.map((step) => ({ ...step, pathPicks: [...step.pathPicks] })),
-      legacyManual: { feats: [...prefix.legacyManual.feats], mythic: [...prefix.legacyManual.mythic] }
+      legacyManual: { feats: [...prefix.legacyManual.feats], mythic: [...prefix.legacyManual.mythic] },
+      legacySkillRanks: sanitizeSkillRanks(prefix.legacySkillRanks)
     });
   }
 
@@ -2084,6 +2108,103 @@
 
   function maxSkillRank(character = currentCharacter()) { return characterLevel(character); }
 
+  function allocatedSkillPoints(ranks) {
+    return DATA.skills.reduce((sum, skill) => sum + (Number(ranks?.[skill.id]) || 0), 0);
+  }
+
+  function perLevelSkillPointBonus(character) {
+    const seen = new Set();
+    return characterEffectProfile(character).effects.filter((effect) => effect.category === "skill-points").reduce((sum, effect) => {
+      const key = `${effect.sourceGuid || effect.occurrenceId}:${effect.type}`;
+      if (seen.has(key)) return sum;
+      seen.add(key);
+      return sum + (Number(effect.value) || 0);
+    }, 0);
+  }
+
+  function rawSkillPointBudgetForStep(prefix, candidate) {
+    const level = characterLevel(candidate);
+    const classEntry = classById.get(candidate.normalSteps.at(-1)?.classId);
+    const classBase = Math.max(0, Number(classEntry?.skillPoints) || 0);
+    const intelligence = effectiveAttributes(candidate).int || 0;
+    const intelligenceModifier = intelligence === 0 ? 0 : Math.floor((intelligence - 10) / 2);
+    const priorRate = perLevelSkillPointBonus(prefix);
+    const currentRate = perLevelSkillPointBonus(candidate);
+    const sourceBonus = Math.max(0, currentRate * level - priorRate * Math.max(0, level - 1));
+    return {
+      rawTotal: Math.max(1, classBase + intelligenceModifier) + sourceBonus,
+      classBase,
+      intelligence,
+      intelligenceModifier,
+      sourceBonus
+    };
+  }
+
+  function skillPointEntitlementThrough(character) {
+    let total = 0;
+    character.normalSteps.forEach((step, index) => {
+      const before = normalPrefix(character, index);
+      const after = normalPrefix(character, index + 1);
+      total += rawSkillPointBudgetForStep(before, after).rawTotal;
+    });
+    return total;
+  }
+
+  function skillPointBudgetForStep(prefix, candidate) {
+    const raw = rawSkillPointBudgetForStep(prefix, candidate);
+    const unplaced = allocatedSkillPoints(candidate.legacySkillRanks);
+    if (!unplaced) return { ...raw, total: raw.rawTotal, legacyCredit: 0 };
+    const legacyCredit = Math.min(raw.rawTotal, Math.max(0, unplaced - skillPointEntitlementThrough(prefix)));
+    return { ...raw, total: raw.rawTotal - legacyCredit, legacyCredit };
+  }
+
+  function skillRankIssues(prefix, candidate, ranks) {
+    const budget = skillPointBudgetForStep(prefix, candidate);
+    const spent = allocatedSkillPoints(ranks);
+    const level = characterLevel(candidate);
+    const issues = [];
+    if (spent !== budget.total) issues.push(`技能点应分配 ${budget.total} 点，当前为 ${spent} 点`);
+    DATA.skills.forEach((skill) => {
+      const current = Number(ranks?.[skill.id]) || 0;
+      if (current < 0 || !Number.isInteger(current)) issues.push(`${skill.name}的本级投入不是合法整数`);
+      if ((prefix.skills?.[skill.id] || 0) + current > level) issues.push(`${skill.name}技能级数超过人物等级 ${level}`);
+    });
+    return issues;
+  }
+
+  function classSkillIds(character, profile = null) {
+    const result = new Set();
+    const byNative = new Map(DATA.skills.map((skill) => [skill.nativeStat, skill.id]));
+    character.normalSteps.forEach((step) => (classById.get(step.classId)?.classSkills || []).forEach((nativeStat) => {
+      if (byNative.has(nativeStat)) result.add(byNative.get(nativeStat));
+    }));
+    (profile || characterEffectProfile(character)).effects.filter((effect) => effect.category === "class-skill").forEach((effect) => {
+      if (byNative.has(effect.stat)) result.add(byNative.get(effect.stat));
+    });
+    return result;
+  }
+
+  function skillProfile(character = currentCharacter()) {
+    const effectProfile = characterEffectProfile(character);
+    const attributes = effectiveAttributes(character, effectProfile);
+    const classSkills = classSkillIds(character, effectProfile);
+    const abilityIds = { Strength: "str", Dexterity: "dex", Constitution: "con", Intelligence: "int", Wisdom: "wis", Charisma: "cha" };
+    return DATA.skills.map((skill) => {
+      let abilityId = skill.ability;
+      effectProfile.effects.filter((effect) => effect.category === "stat-base" && effect.stat === skill.nativeStat && abilityIds[effect.ability]).forEach((effect) => {
+        const replacement = abilityIds[effect.ability];
+        const currentMod = Math.floor(((attributes[abilityId] || 0) - 10) / 2);
+        const replacementMod = Math.floor(((attributes[replacement] || 0) - 10) / 2);
+        if (!effect.ifHigher || replacementMod > currentMod) abilityId = replacement;
+      });
+      const abilityModifier = attributes[abilityId] === 0 ? 0 : Math.floor((attributes[abilityId] - 10) / 2);
+      const ranks = Number(character.skills?.[skill.id]) || 0;
+      const classSkillBonus = classSkills.has(skill.id) && ranks > 0 ? 3 : 0;
+      const permanentBonus = sourceFullStatValue(character, skill.nativeStat, effectProfile);
+      return { ...skill, ranks, abilityId, abilityModifier, classSkill: classSkills.has(skill.id), classSkillBonus, permanentBonus, total: ranks + abilityModifier + classSkillBonus + permanentBonus };
+    });
+  }
+
   function nativeGuid(value) {
     const match = String(value || "").match(/(?:!bp_)?([0-9a-f]{32})/i);
     return match ? match[1].toLowerCase() : null;
@@ -2657,8 +2778,8 @@
     const heritages = (DATA.heritages || []).filter((item) => item.raceId === character.race);
     const needsRaceAbility = raceAbilityRequired(character);
     elements.workspace.innerHTML = `${workspaceHead("ANCESTRY / HERITAGE", "选择种族与子种族", locked ? "原版入队模式保留队友种族；开启完全洗点后可按 Mod 逻辑重设。" : "先选基础种族，再选其血统或子种族；一级种族槽会随选择立即重算。")}
-      <div class="choice-grid">${DATA.races.filter((race) => race.playable !== false).map((race) => `<button type="button" class="choice-card ${character.race === race.id ? "selected" : ""}" data-race="${race.id}" ${locked ? "disabled" : ""}><span class="choice-code">${escapeHtml(race.bonus)}</span><h3>${escapeHtml(race.name)}</h3><p>${escapeHtml(race.text)}</p>${race.feat ? "<small>额外一级专长</small>" : ""}</button>`).join("")}</div>
-      <section class="nested-choice-section"><h3>${escapeHtml(DATA.races.find((race) => race.id === character.race)?.name || "种族")} · 子种族 / 血统</h3><div class="choice-grid compact-grid">${heritages.map((item) => `<button type="button" class="choice-card ${character.heritage === item.id ? "selected" : ""}" data-heritage="${item.id}" ${locked ? "disabled" : ""}><span class="choice-code">${escapeHtml(item.bonus)}</span><h3>${escapeHtml(item.name)}</h3><p>${escapeHtml(item.text)}</p></button>`).join("") || `<p class="choice-note">此特殊种族没有可编辑的子种族。</p>`}</div></section>
+      <div class="choice-grid">${DATA.races.filter((race) => race.playable !== false).map((race) => longChoiceCard({ selected: character.race === race.id, disabled: locked, dataAttributes: `data-race="${race.id}"`, code: race.bonus, title: race.name, text: race.text, footer: race.feat ? "<small>额外一级专长</small>" : "" })).join("")}</div>
+      <section class="nested-choice-section"><h3>${escapeHtml(DATA.races.find((race) => race.id === character.race)?.name || "种族")} · 子种族 / 血统</h3><div class="choice-grid compact-grid">${heritages.map((item) => longChoiceCard({ selected: character.heritage === item.id, disabled: locked, dataAttributes: `data-heritage="${item.id}"`, code: item.bonus, title: item.name, text: item.text })).join("") || `<p class="choice-note">此特殊种族没有可编辑的子种族。</p>`}</div></section>
       ${needsRaceAbility ? `<section class="nested-choice-section"><h3>种族属性加值 · 必选 +2</h3><div class="alignment-grid">${DATA.abilities.filter((ability) => !(currentCompanion().path === "lich" && ability.id === "con")).map((ability) => `<button type="button" class="choice-card ${character.raceAbility === ability.id ? "selected" : ""}" data-race-ability="${ability.id}" ${locked ? "disabled" : ""}><span class="choice-code">${ability.short} +2</span><h3>${escapeHtml(ability.name)}</h3></button>`).join("")}</div><p class="choice-note">该选择独立存档，并参与一级职业、专长与后续所有属性前置校验。</p></section>` : ""}`;
   }
 
@@ -2682,7 +2803,7 @@
     ];
     elements.workspace.innerHTML = `${workspaceHead("ORIGIN / PROFESSION", "选择出身", "出身按大类与具体职业两层呈现；选择结果仍以稳定的小出身 ID 存档。")}
       <div class="category-tabs">${categories.map((category) => `<button type="button" class="${ui.backgroundCategory === category.id ? "active" : ""}" data-background-category="${escapeHtml(category.id)}">${escapeHtml(category.name)}<small>${DATA.backgrounds.filter((item) => (item.categoryId || item.category || "其他") === category.id).length}</small></button>`).join("")}</div>
-      <div class="choice-grid">${visible.map((background) => `<button type="button" class="choice-card ${character.background === background.id ? "selected" : ""}" data-background="${background.id}" ${locked ? "disabled" : ""}><span class="choice-code">${escapeHtml(background.category || "出身")} · ${(background.skills || []).map((id) => escapeHtml(skillById.get(id)?.name || id)).join(" / ") || "无额外本职技能"}</span><h3>${escapeHtml(background.name)}</h3><p>${escapeHtml(background.text)}</p></button>`).join("")}</div>
+      <div class="choice-grid">${visible.map((background) => longChoiceCard({ selected: character.background === background.id, disabled: locked, dataAttributes: `data-background="${background.id}"`, code: `${background.category || "出身"} · ${(background.skills || []).map((id) => skillById.get(id)?.name || id).join(" / ") || "无额外本职技能"}`, title: background.name, text: background.text })).join("")}</div>
       ${selected ? `<section class="nested-choice-section"><h3>${escapeHtml(selected.name)} · 实机结构化效果</h3><div class="class-stack">${profileLabels.map((label) => `<span class="feat-chip">${escapeHtml(label)}</span>`).join("") || `<span class="feat-chip">无无条件数值、技能或装备擅长修正</span>`}</div><p class="choice-note">仅把无条件永久效果计入裸装数值；针对特定武器、目标或战斗状态的组件保留在百科说明中，不伪装成常驻加值。</p></section>` : ""}
       ${selected?.parameter ? `<section class="nested-choice-section"><h3>${escapeHtml(selected.name)} · 细分选项</h3>${parameterControl(selected, character.backgroundParams || {}, selected.id, "background", locked)}<p class="choice-note">该选择与出身一起存档，切换出身时会重新校验。</p></section>` : ""}`;
   }
@@ -2694,7 +2815,7 @@
     const faithWarning = deity && !deity.alignments.includes(character.alignment) ? "当前阵营与所选信仰不兼容。" : !character.deity ? "尚未选择信仰；牧师、审判官、战争祭司与圣武士会因此不可选。" : "阵营与信仰兼容。";
     elements.workspace.innerHTML = `${workspaceHead("ALIGNMENT / FAITH", "阵营与信仰", "阵营会参与职业前置；任意角色均可选择神祇或无神论，神职职业还会据此过滤领域。")}
       <section class="nested-choice-section"><h3>选择阵营</h3><div class="alignment-grid">${DATA.alignments.map((item) => `<button type="button" class="choice-card ${character.alignment === item.id ? "selected" : ""}" data-alignment="${item.id}" ${locked ? "disabled" : ""}><span class="choice-code">${item.id}</span><h3>${escapeHtml(item.name)}</h3></button>`).join("")}</div></section>
-      <section class="nested-choice-section"><h3>选择信仰</h3><p class="choice-note">${escapeHtml(faithWarning)}</p><div class="choice-grid compact-grid">${DATA.deities.map((item) => { const compatible = item.alignments.includes(character.alignment); return `<button type="button" class="choice-card ${character.deity === item.id ? "selected" : ""}" data-deity="${item.id}" ${locked || !compatible ? "disabled" : ""}><span class="choice-code">${escapeHtml(item.weapon)} · ${item.alignments.map(nativeAlignmentName).join("/")}</span><h3>${escapeHtml(item.name)}</h3><p>${escapeHtml(item.text || `偏好武器：${item.weapon}；领域：${item.domains.map((id) => domainById.get(id)?.name || id).join("、") || "无"}`)}</p></button>`; }).join("")}</div></section>`;
+      <section class="nested-choice-section"><h3>选择信仰</h3><p class="choice-note">${escapeHtml(faithWarning)}</p><div class="choice-grid compact-grid">${DATA.deities.map((item) => { const compatible = item.alignments.includes(character.alignment); return longChoiceCard({ selected: character.deity === item.id, disabled: locked || !compatible, dataAttributes: `data-deity="${item.id}"`, code: `${item.weapon} · ${item.alignments.map(nativeAlignmentName).join("/")}`, title: item.name, text: item.text || `偏好武器：${item.weapon}；领域：${item.domains.map((id) => domainById.get(id)?.name || id).join("、") || "无"}` }); }).join("")}</div></section>`;
   }
 
   function pointSpent(character = currentCharacter()) {
@@ -2711,7 +2832,8 @@
     const editable = companion.id === "commander" || character.fullRespec;
     const remaining = 25 - pointSpent(character);
     const finalAttributes = effectiveAttributes(character);
-    elements.workspace.innerHTML = `${workspaceHead("ABILITY SCORES / SKILLS", "属性与技能", editable ? "25 点购点按游戏基准计算；技能等级会参与进阶职业前置判断。" : "原版入队属性已锁定；技能仍可用于规划后续等级。")}
+    const skills = skillProfile(character);
+    elements.workspace.innerHTML = `${workspaceHead("ABILITY SCORES / SKILLS", "属性与技能", editable ? "25 点购点按游戏基准计算；技能点在每一级升级记录中分配。" : "原版入队属性已锁定；后续技能点在对应升级等级中分配。")}
       <div class="attribute-console"><div><div class="attribute-list">${DATA.abilities.map((ability) => {
         const value = character.attributes[ability.id];
         const undeadCon = companion.path === "lich" && ability.id === "con";
@@ -2720,7 +2842,7 @@
         const mod = Math.floor((finalValue - 10) / 2);
         return `<div class="attribute-row"><strong>${ability.name}<small>${ability.short}</small></strong><span></span><button type="button" data-ability="${ability.id}" data-delta="-1" ${!editable || undeadCon || value <= min ? "disabled" : ""}>−</button><output title="购点基础值">${undeadCon ? "—" : value}</output><button type="button" data-ability="${ability.id}" data-delta="1" ${!editable || undeadCon || value >= 18 ? "disabled" : ""}>＋</button><span class="ability-mod" title="含种族、血统与等级成长">${undeadCon ? "亡灵" : `最终 ${finalValue} · ${mod >= 0 ? "+" : ""}${mod}`}</span></div>`;
       }).join("")}</div>
-      <div class="skill-editor"><h3>技能等级 · 上限 ${maxSkillRank(character)}</h3><div class="skill-grid">${DATA.skills.map((skill) => `<div class="skill-row"><span>${escapeHtml(skill.name)}</span><button type="button" data-skill="${skill.id}" data-delta="-1" ${(character.skills[skill.id] || 0) <= 0 ? "disabled" : ""}>−</button><output>${character.skills[skill.id] || 0}</output><button type="button" data-skill="${skill.id}" data-delta="1" ${(character.skills[skill.id] || 0) >= maxSkillRank(character) ? "disabled" : ""}>＋</button></div>`).join("")}</div></div></div>
+      <div class="skill-editor"><h3>技能总览 · 技能级数上限 ${maxSkillRank(character)}</h3><div class="skill-summary-grid">${skills.map((skill) => `<div class="skill-summary-row"><span><strong>${escapeHtml(skill.name)}</strong><small>${escapeHtml(abilityById.get(skill.abilityId)?.short || skill.abilityId)}${skill.classSkill ? " · 本职" : ""}</small></span><span title="已投入技能级数">${skill.ranks} 级</span><span title="属性调整值 / 本职技能 / 永久加值">${signed(skill.abilityModifier)}${skill.classSkillBonus ? ` +${skill.classSkillBonus}` : ""}${skill.permanentBonus ? ` ${signed(skill.permanentBonus)}` : ""}</span><output>${signed(skill.total)}</output></div>`).join("")}</div><p class="choice-note">最终检定值 = 已投入级数 + 当前关联属性调整值 + 本职技能奖励（投入至少 1 级时 +3）+ 已建模永久加值；条件性与临时加值不混入。</p></div></div>
       <aside class="point-budget"><span>剩余购点</span><strong class="${remaining < 0 ? "over" : ""}">${remaining}</strong><p>中间数字是购点基础值；右侧“最终”值由当前种族、血统、种族可选 +2 与每 4 级成长按历史重放。亡灵队友体质固定为“—”。</p></aside></div>`;
   }
 
@@ -2749,6 +2871,14 @@
     const fixedArchetype = selectedArchetype(prefix, step.classId);
     if (fixedArchetype !== null && fixedArchetype !== step.archetypeId) issues.push(`${classEntry?.name || step.classId}原型与此前等级不一致`);
     if ((index + 1) % 4 === 0 && !abilityById.has(step.abilityIncrease)) issues.push("本级属性成长尚未选择");
+    const skillCandidate = rebuildCharacter({
+      ...prefix,
+      normalSteps: [...prefix.normalSteps, { ...step, skillRanks: sanitizeSkillRanks(step.skillRanks) }],
+      mythicSteps: prefix.mythicSteps.map((mythicStep) => ({ ...mythicStep, pathPicks: [...mythicStep.pathPicks] })),
+      legacyManual: { feats: [...prefix.legacyManual.feats], mythic: [...prefix.legacyManual.mythic] },
+      legacySkillRanks: sanitizeSkillRanks(prefix.legacySkillRanks)
+    });
+    skillRankIssues(prefix, skillCandidate, step.skillRanks).forEach((issue) => issues.push(issue));
 
     const featSlots = featSlotsForStep(prefix, step.classId, step.archetypeId);
     const featChoices = step.featChoices || [];
@@ -2865,6 +2995,7 @@
     }).filter(([, domainId]) => domainId));
     ui.nextDomains = Object.values(ui.nextDomainChoices);
     ui.nextKnownSpells = [...(step?.knownSpellIds || [])];
+    ui.nextSkillRanks = sanitizeSkillRanks(step?.skillRanks);
     ui.nextAbilityIncrease = abilityById.has(step?.abilityIncrease) ? step.abilityIncrease : null;
     ui.levelDraftKey = key;
   }
@@ -2898,7 +3029,7 @@
     const selectedFeatureChoices = featureSlots.map((slot) => ui.nextFeatureChoices[slot.id] ? ({ slotId: slot.id, groupId: slot.groupId, ...ui.nextFeatureChoices[slot.id] }) : null).filter(Boolean);
     const selectedDomainChoices = domainSlots.map((slot) => ui.nextDomainChoices[slot.id] ? ({ slotId: slot.id, source: slot.source, sourceGuid: slot.sourceGuid || null, domainId: ui.nextDomainChoices[slot.id] }) : null).filter(Boolean);
     ui.nextDomains = selectedDomainChoices.map((choice) => choice.domainId);
-    const withChoices = (choices) => rebuildCharacter({ ...candidate, normalSteps: candidate.normalSteps.map((step, index) => index === candidate.normalSteps.length - 1 ? { ...step, featChoices: choices, featureChoices: selectedFeatureChoices, domainChoices: selectedDomainChoices, domainIds: [...ui.nextDomains], knownSpellIds: [...ui.nextKnownSpells] } : step), mythicSteps: candidate.mythicSteps.map((step) => ({ ...step, pathPicks: [...step.pathPicks] })), legacyManual: { feats: [...candidate.legacyManual.feats], mythic: [...candidate.legacyManual.mythic] } });
+    const withChoices = (choices) => rebuildCharacter({ ...candidate, normalSteps: candidate.normalSteps.map((step, index) => index === candidate.normalSteps.length - 1 ? { ...step, featChoices: choices, featureChoices: selectedFeatureChoices, skillRanks: sanitizeSkillRanks(ui.nextSkillRanks), domainChoices: selectedDomainChoices, domainIds: [...ui.nextDomains], knownSpellIds: [...ui.nextKnownSpells] } : step), mythicSteps: candidate.mythicSteps.map((step) => ({ ...step, pathPicks: [...step.pathPicks] })), legacyManual: { feats: [...candidate.legacyManual.feats], mythic: [...candidate.legacyManual.mythic] }, legacySkillRanks: sanitizeSkillRanks(candidate.legacySkillRanks) });
     let runningChoices = [];
     const seenChoiceKeys = new Set(prefix.featChoices.map(choiceKey));
     const featValid = featSlots.every((slot) => {
@@ -2924,6 +3055,10 @@
       return valid;
     });
     const candidateWithFeats = withChoices(selectedFeatChoices);
+    const skillBudget = selectedClass ? skillPointBudgetForStep(prefix, candidateWithFeats) : { total: 0, rawTotal: 0, classBase: 0, intelligence: 0, intelligenceModifier: 0, sourceBonus: 0, legacyCredit: 0 };
+    const skillSpent = allocatedSkillPoints(ui.nextSkillRanks);
+    const skillValid = Boolean(selectedClass && skillRankIssues(prefix, candidateWithFeats, ui.nextSkillRanks).length === 0);
+    const candidateSkillProfile = selectedClass ? skillProfile(candidateWithFeats) : [];
     const domainValid = selectedDomainChoices.length === domainSlots.length
       && new Set(selectedDomainChoices.map((choice) => choice.domainId)).size === selectedDomainChoices.length
       && domainSlots.every((slot) => domainsForSlot(prefix, selectedClass?.id, ui.nextArchetype, slot).some((domain) => domain.id === ui.nextDomainChoices[slot.id]));
@@ -2935,6 +3070,7 @@
     const classesHtml = classChoices(prefix).map(({ entry, eligible }) => `<button type="button" class="compact-choice ${ui.nextClass === entry.id ? "selected" : ""}" data-next-class="${entry.id}" ${eligible && !locked ? "" : "disabled"}><span><strong>${escapeHtml(entry.name)}</strong><small>${escapeHtml(entry.role)} · ${escapeHtml(entry.text)}</small></span><span class="choice-state ${eligible ? "valid" : "locked"}">${eligible ? (entry.group === "prestige" ? "进阶可选" : entry.bab === "full" ? "满 BAB" : "可选") : escapeHtml(requirementText(entry, prefix))}</span></button>`).join("");
     const archetypeHtml = selectedClass && selectedClass.group === "base" ? `<section class="level-choice-block"><h3>职业原型 · ${escapeHtml(selectedClass.name)}</h3><label class="select-field"><span>原型一经选择，后续该基类等级沿用同一原型</span><select id="archetype-select" ${locked || lockedArchetype !== null ? "disabled" : ""}><option value="">基础职业（无原型）</option>${archetypes.map((item) => { const eligible = isEligible(item, prefix); return `<option value="${item.id}" ${ui.nextArchetype === item.id ? "selected" : ""} ${!eligible && ui.nextArchetype !== item.id ? "disabled" : ""}>${escapeHtml(item.name)}${eligible ? "" : ` · ${escapeHtml(requirementText(item, prefix))}`}</option>`; }).join("")}</select></label>${ui.nextArchetype ? `<p class="choice-note">${escapeHtml(archetypeByKey.get(archetypeKey(selectedClass.id, ui.nextArchetype))?.text || "该原型替换基类的部分职业能力。")}</p>` : ""}</section>` : "";
     const abilityIncreaseHtml = abilityIncreaseRequired ? `<section class="level-choice-block"><h3>本级属性成长 · 必选 +1</h3><label class="select-field"><span>角色等级 ${nextLevel} 的永久属性提升</span><select data-ability-increase ${locked ? "disabled" : ""}><option value="">请选择</option>${DATA.abilities.filter((ability) => !(currentCompanion().path === "lich" && ability.id === "con")).map((ability) => `<option value="${ability.id}" ${ui.nextAbilityIncrease === ability.id ? "selected" : ""}>${escapeHtml(ability.name)}（${ability.short}）</option>`).join("")}</select></label><p class="choice-note">该提升先于本级专长前置校验生效，并随本级记录一起回退。</p></section>` : "";
+    const skillsHtml = selectedClass ? `<section class="level-choice-block skill-level-block"><h3>本级技能点 · ${skillSpent}/${skillBudget.total}</h3><p class="choice-note">${escapeHtml(selectedClass.name)}基础 ${skillBudget.classBase} + 智力 ${skillBudget.intelligence}（${signed(skillBudget.intelligenceModifier)}）${skillBudget.sourceBonus ? ` + 特性补发 ${skillBudget.sourceBonus}` : ""}${skillBudget.legacyCredit ? ` − 旧存档已分配 ${skillBudget.legacyCredit}` : ""}；基础与智力合计最低为 1。技能级数不能超过人物等级。</p><div class="skill-grid">${candidateSkillProfile.map((skill) => { const current = ui.nextSkillRanks[skill.id] || 0; const prior = prefix.skills?.[skill.id] || 0; const atRankCap = prior + current >= nextLevel; return `<div class="skill-row level-skill-row"><span><strong>${escapeHtml(skill.name)}</strong><small>${escapeHtml(abilityById.get(skill.abilityId)?.short || skill.abilityId)}${skill.classSkill ? " · 本职" : ""} · 总值 ${signed(skill.total)}</small></span><button type="button" data-next-skill="${skill.id}" data-delta="-1" ${locked || current <= 0 ? "disabled" : ""}>−</button><output title="本级投入 / 当前总级数">${current}<small>${prior + current} 级</small></output><button type="button" data-next-skill="${skill.id}" data-delta="1" ${locked || skillSpent >= skillBudget.total || atRankCap ? "disabled" : ""}>＋</button></div>`; }).join("")}</div></section>` : "";
     const featsHtml = featSlots.length ? featSlots.map((slot, slotIndex) => {
       const choice = ui.nextFeatChoices[slot.id];
       const item = featById.get(choice?.id);
@@ -2948,9 +3084,9 @@
     const spellsHtml = spellSlotTotal ? `<section class="level-choice-block"><h3>自发施法 · 本级新增 ${spellSlotTotal} 个已知法术</h3>${Object.entries(spellSpec).map(([level, count]) => `<div class="spell-level-group"><h4>${level} 环 · ${ui.nextKnownSpells.filter((id) => spellLevelForClass(spellById.get(id), selectedClass.id, ui.nextArchetype) === Number(level)).length}/${count}</h4><div class="option-tile-grid">${spellPoolForClass(selectedClass.id, ui.nextArchetype, Number(level)).map((spell) => { const picked = selectedSpellSet.has(spell.id); const ringFull = ui.nextKnownSpells.filter((id) => spellLevelForClass(spellById.get(id), selectedClass.id, ui.nextArchetype) === Number(level)).length >= count; return `<button type="button" class="option-tile ${picked ? "selected" : ""}" data-next-spell="${spell.id}" ${(!picked && ringFull) || locked ? "disabled" : ""}><strong>${escapeHtml(spell.name)}</strong><small>${escapeHtml(spell.text)}</small></button>`; }).join("")}</div></div>`).join("")}</section>` : selectedClass && casting.spontaneous ? `<section class="level-choice-block"><h3>自发施法</h3><p class="choice-note">本级已知法术总量没有增加；自动授予的血脉、秘示域与诅咒法术不消耗自由选择槽。</p></section>` : "";
     const timeline = `<div class="build-timeline" aria-label="普通等级时间线">${character.normalSteps.map((step, index) => `<button type="button" class="timeline-step ${cursor === index ? "active" : ""} ${step.locked ? "preset" : ""}" data-level-cursor="${index}"><span>LV ${index + 1}</span><strong>${escapeHtml(classLabel(step.classId))}</strong><small>${escapeHtml(step.archetypeId ? archetypeByKey.get(archetypeKey(step.classId, step.archetypeId))?.name || step.archetypeId : "基础职业")}</small></button>`).join("")}<button type="button" class="timeline-step add ${cursor === character.normalSteps.length ? "active" : ""}" data-level-cursor="next" ${character.normalSteps.length >= maxLevel ? "disabled" : ""}><span>＋</span><strong>下一等级</strong><small>LV ${character.normalSteps.length + 1}</small></button></div>`;
     elements.workspace.innerHTML = `${workspaceHead("CHARACTER LEVEL / EDITABLE HISTORY", `${existing ? "检查 / 编辑" : "规划"} ${nextLevel} 级`, "每一级保存职业、原型、属性成长、专长、领域与已知法术。点击时间线可切换任意级，修改后会重新校验后续等级。")}${timeline}
-      <div class="level-console"><div class="level-column"><section class="level-choice-block"><h3>选择职业</h3><div class="compact-choice-list">${classesHtml}</div></section>${archetypeHtml}${abilityIncreaseHtml}${featuresHtml}<section class="level-choice-block"><h3>本级专长 · ${selectedFeatChoices.length}/${featSlots.length}</h3><div class="slot-list">${featsHtml}</div></section>${domainsHtml}${spellsHtml}</div>
-      <aside class="level-review"><span class="choice-code">LEVEL ${nextLevel} REVIEW</span><h3>${escapeHtml(selectedClass?.name || "尚未选择职业")}${ui.nextArchetype ? ` · ${escapeHtml(archetypeByKey.get(archetypeKey(ui.nextClass, ui.nextArchetype))?.name || ui.nextArchetype)}` : ""}</h3><dl><div><dt>级前快照</dt><dd>LV ${characterLevel(prefix)} · BAB +${baseAttack(prefix)}</dd></div><div><dt>本级完成后</dt><dd>LV ${nextLevel} · BAB +${baseAttack(candidate)}</dd></div><div><dt>属性成长</dt><dd>${ui.nextAbilityIncrease ? `${abilityById.get(ui.nextAbilityIncrease)?.name} +1` : abilityIncreaseRequired ? "尚未选择" : "无"}</dd></div><div><dt>专长槽</dt><dd>${selectedFeatChoices.map((choice) => parameterLabel(featById.get(choice.id), choice.params)).filter(Boolean).join("、") || "无"}</dd></div><div><dt>职业选择</dt><dd>${selectedFeatureChoices.map(featureChoiceLabel).join("、") || "无"}</dd></div><div><dt>领域</dt><dd>${selectedDomainChoices.map((choice) => domainById.get(choice.domainId)?.name).join("、") || "无"}</dd></div><div><dt>已知法术</dt><dd>${ui.nextKnownSpells.map((id) => spellById.get(id)?.name).join("、") || "无新增"}</dd></div><div><dt>职业条件</dt><dd>${escapeHtml(selectedClass ? requirementText(selectedClass, prefix) : "请选择职业")}</dd></div></dl>
-      ${locked ? `<p class="choice-note">这是原版入队前缀。开启“完全洗点”后才可改写。</p>` : `<button class="commit-level" type="button" data-commit-level ${ancestryValid && classEligible && archetypeEligible && abilityIncreaseValid && featValid && featureValid && domainValid && spellValid && nextLevel <= maxLevel ? "" : "disabled"}>${existing ? `保存第 ${nextLevel} 级修改` : `确认升至 ${nextLevel} 级`}</button>`}
+      <div class="level-console"><div class="level-column"><section class="level-choice-block"><h3>选择职业</h3><div class="compact-choice-list">${classesHtml}</div></section>${archetypeHtml}${abilityIncreaseHtml}${featuresHtml}<section class="level-choice-block"><h3>本级专长 · ${selectedFeatChoices.length}/${featSlots.length}</h3><div class="slot-list">${featsHtml}</div></section>${skillsHtml}${domainsHtml}${spellsHtml}</div>
+      <aside class="level-review"><span class="choice-code">LEVEL ${nextLevel} REVIEW</span><h3>${escapeHtml(selectedClass?.name || "尚未选择职业")}${ui.nextArchetype ? ` · ${escapeHtml(archetypeByKey.get(archetypeKey(ui.nextClass, ui.nextArchetype))?.name || ui.nextArchetype)}` : ""}</h3><dl><div><dt>级前快照</dt><dd>LV ${characterLevel(prefix)} · BAB +${baseAttack(prefix)}</dd></div><div><dt>本级完成后</dt><dd>LV ${nextLevel} · BAB +${baseAttack(candidate)}</dd></div><div><dt>属性成长</dt><dd>${ui.nextAbilityIncrease ? `${abilityById.get(ui.nextAbilityIncrease)?.name} +1` : abilityIncreaseRequired ? "尚未选择" : "无"}</dd></div><div><dt>技能点</dt><dd>${skillSpent}/${skillBudget.total}</dd></div><div><dt>专长槽</dt><dd>${selectedFeatChoices.map((choice) => parameterLabel(featById.get(choice.id), choice.params)).filter(Boolean).join("、") || "无"}</dd></div><div><dt>职业选择</dt><dd>${selectedFeatureChoices.map(featureChoiceLabel).join("、") || "无"}</dd></div><div><dt>领域</dt><dd>${selectedDomainChoices.map((choice) => domainById.get(choice.domainId)?.name).join("、") || "无"}</dd></div><div><dt>已知法术</dt><dd>${ui.nextKnownSpells.map((id) => spellById.get(id)?.name).join("、") || "无新增"}</dd></div><div><dt>职业条件</dt><dd>${escapeHtml(selectedClass ? requirementText(selectedClass, prefix) : "请选择职业")}</dd></div></dl>
+      ${locked ? `<p class="choice-note">这是原版入队前缀。开启“完全洗点”后才可改写。</p>` : `<button class="commit-level" type="button" data-commit-level ${ancestryValid && classEligible && archetypeEligible && abilityIncreaseValid && skillValid && featValid && featureValid && domainValid && spellValid && nextLevel <= maxLevel ? "" : "disabled"}>${existing ? `保存第 ${nextLevel} 级修改` : `确认升至 ${nextLevel} 级`}</button>`}
       <button class="rollback-level" type="button" data-truncate-level="${nextLevel}" ${cursor >= character.normalSteps.length - 1 || locked ? "disabled" : ""}>回退到此级（移除后续）</button>
       <button class="rollback-level" type="button" data-rollback-level ${character.normalSteps.length <= (currentCompanion().id === "commander" || character.fullRespec ? 1 : currentCompanion().level) ? "disabled" : ""}>撤销最后一级</button></aside></div>`;
   }
@@ -3348,6 +3484,7 @@
       if (activePath) pathChoiceIssues(prefix, activePath, step.rank, choicesBySlot).forEach((issue) => warnings.push(`MR ${step.rank}：${issue}`));
     });
     if (character.legacyManual.feats.length || character.legacyManual.mythic.length) warnings.push("存在旧存档/百科手动记录，取得等级未知");
+    if ((currentCompanion().id === "commander" || character.fullRespec) && allocatedSkillPoints(character.legacySkillRanks)) warnings.push("存在旧存档技能级数，取得等级未知；后续等级仍会按新预算校验");
     if (character.legacyUnplacedPathChoices?.length) warnings.push(`存在 ${character.legacyUnplacedPathChoices.length} 项旧版道途选择无法唯一映射，原记录已保留，请在对应神话阶重新选择`);
     character.mythicSteps.forEach((step) => { const choice = step.commonChoice; const item = mythicById.get(choice?.id); if (item && !parameterComplete(item, choice.params)) warnings.push(`MR ${step.rank}：${item.name}缺少细分选项`); });
     if (character.mythicRank >= 3 && currentCompanion().id === "commander" && !character.mythicPath) warnings.push("神话 3 阶后尚未选择主道途");
@@ -3379,11 +3516,13 @@
     const featureLabels = character.featureChoices.map((choice) => featureChoiceLabel(choice));
     const autoFeatureGrants = featureAutoGrants(character);
     const finalAttributes = effectiveAttributes(character);
+    const skills = skillProfile(character);
     elements.sheetValidity.textContent = warnings.length ? `${warnings.length} 项待校准` : "规则通过";
     elements.sheetValidity.className = warnings.length ? "warn" : "valid";
     elements.liveSheet.innerHTML = `<div class="sheet-summary"><h3>${escapeHtml(companion.name)}</h3><p>${escapeHtml(DATA.races.find((race) => race.id === character.race)?.name || companion.race)}${heritage ? ` · ${escapeHtml(heritage.name)}` : ""}${background ? ` · ${escapeHtml(parameterLabel(background, character.backgroundParams || {}))}` : ""} · ${escapeHtml(alignment)} · ${escapeHtml(deity)} · ${escapeHtml(mythic.activePath ? pathById.get(mythic.activePath)?.name : "未选道途")}</p><div class="sheet-metrics"><div><span>LEVEL</span><strong>${characterLevel(character)}</strong></div><div><span>BAB</span><strong>+${baseAttack(character)}</strong></div><div><span>MYTHIC</span><strong>${character.mythicRank}</strong></div></div></div>
       <section class="sheet-section total-panel"><h3>OVERALL · 裸装基线</h3><div class="total-stat-grid"><div><span>基础生命 ≈</span><strong>${stats.hp}</strong></div><div><span>裸装 AC</span><strong>${stats.ac}</strong></div><div><span>先攻</span><strong>${signed(stats.initiative)}</strong></div><div><span>近战命中</span><strong>${signed(stats.melee)}</strong></div><div><span>远程命中</span><strong>${signed(stats.ranged)}</strong></div><div><span>迭代 BAB</span><strong>${stats.attacks}</strong></div><div><span>强韧</span><strong>${signed(stats.fort)}</strong></div><div><span>反射</span><strong>${signed(stats.ref)}</strong></div><div><span>意志</span><strong>${signed(stats.will)}</strong></div><div><span>CMB / CMD</span><strong>${signed(stats.cmb)} / ${stats.cmd}</strong></div><div><span>最高法术 DC</span><strong>${stats.spellDc ?? "—"}</strong></div><div><span>已知法术</span><strong>${allKnownSpells(character).length}</strong></div></div><p class="sheet-caveat">不含装备、姿态、临时 Buff 与目标条件；生命值按一级满骰、后续平均骰估算。</p></section>
       <section class="sheet-section"><h3>ABILITY SCORES</h3><div class="ability-mini-grid">${DATA.abilities.map((ability) => `<div class="ability-mini"><span>${ability.name}</span><strong>${finalAttributes[ability.id] === 0 ? "—" : finalAttributes[ability.id]}</strong>${character.attributesMode !== "final" && finalAttributes[ability.id] !== character.attributes[ability.id] ? `<small>基础 ${character.attributes[ability.id]}</small>` : ""}</div>`).join("")}</div></section>
+      <section class="sheet-section"><h3>SKILLS · 级数 / 总检定</h3><div class="sheet-skill-grid">${skills.map((skill) => `<div><span>${escapeHtml(skill.name)}${skill.classSkill ? " · 本职" : ""}</span><strong>${skill.ranks} / ${signed(skill.total)}</strong></div>`).join("")}</div><p class="sheet-caveat">总检定含关联属性、本职 +3 与已建模永久加值，不含临时或条件效果。</p></section>
       <section class="sheet-section effect-overview"><h3>PERMANENT EFFECTS · 当前安装版规则投影</h3><p class="sheet-caveat">按等级历史、细分选项与授予链回放；条件效果单独列出，不并入无条件总值。</p>${effectGroups.map((group) => `<div class="effect-group"><h4>${escapeHtml(group.name)} · ${group.entries.reduce((sum, entry) => sum + (entry.itemCount || entry.count), 0)}</h4><div class="class-stack">${group.entries.map((effect) => `<span class="feat-chip effect" title="${escapeHtml(`${effect.originLabel}｜${effect.sourceName}`)}">${escapeHtml(effect.label)}${effect.count > 1 ? ` ×${effect.count}` : ""}</span>`).join("")}</div></div>`).join("") || "<p class=\"sheet-caveat\">当前等级尚无可投影的永久效果。</p>"}${sourceEffects.unknownTypes.size ? `<details class="native-gap"><summary>尚未折算为数值的原生执行组件 · ${[...sourceEffects.unknownTypes.values()].reduce((sum, count) => sum + count, 0)}</summary><p>${escapeHtml([...sourceEffects.unknownTypes.entries()].map(([type, count]) => `${type} ×${count}`).join("、"))}</p></details>` : ""}</section>
       <section class="sheet-section build-overview"><h3>SELECTED BUILD OVERVIEW</h3><h4>职业与原型</h4><div class="class-stack">${classDetails.map(({ classId, archetypeId, count }) => `<span class="class-chip">${escapeHtml(classLabel(classId))}${archetypeId ? ` · ${escapeHtml(archetypeByKey.get(archetypeKey(classId, archetypeId))?.name || archetypeId)}` : ""} ${count}</span>`).join("") || "<span class=\"feat-chip\">等待选择</span>"}</div><h4>职业特性选择 · ${featureLabels.length}</h4><div class="class-stack">${[...featureLabels, ...autoFeatureGrants].map((name) => `<span class="feat-chip path">${escapeHtml(name)}</span>`).join("") || "<span class=\"feat-chip\">未记录职业特性选择</span>"}</div><h4>普通专长 · ${featLabels.length || character.feats.length}</h4><div class="class-stack">${(featLabels.length ? featLabels : character.feats.map((id) => featById.get(id)?.name || id)).map((name) => `<span class="feat-chip">${escapeHtml(name)}</span>`).join("") || "<span class=\"feat-chip\">未记录专长</span>"}</div><h4>通用神话能力 / 专长 · ${mythic.activeCommon.length}</h4><div class="class-stack">${character.mythicChoiceRecords.map((choice) => `<span class="feat-chip mythic">${escapeHtml(parameterLabel(mythicById.get(choice.id), choice.params))}</span>`).join("") || "<span class=\"feat-chip\">未记录</span>"}</div><h4>${escapeHtml(mythic.activePath ? pathById.get(mythic.activePath)?.name : "道途")}能力</h4><div class="class-stack">${[...mythic.grants, ...pathPicks].map((name) => `<span class="feat-chip path">${escapeHtml(name)}</span>`).join("") || "<span class=\"feat-chip\">未选择道途能力</span>"}</div>${lostPathPicks.length ? `<h4>转道后失去</h4><div class="class-stack lost">${lostPathPicks.map((name) => `<span class="feat-chip">${escapeHtml(name)}</span>`).join("")}</div>` : ""}</section>
       <section class="sheet-section"><h3>DOMAINS / SPELLS</h3><div class="class-stack">${domainPowers.map((name) => `<span class="feat-chip domain">${escapeHtml(name)}</span>`).join("") || "<span class=\"feat-chip\">无领域能力</span>"}</div><div class="class-stack"><span class="feat-chip">奥术 ${spells.arcane} 环</span><span class="feat-chip">神术 ${spells.divine} 环</span><span class="feat-chip">偷袭 ${sneakDice(character)}d6</span>${allKnownSpells(character).map((id) => `<span class="feat-chip">${escapeHtml(spellById.get(id)?.name || id)}</span>`).join("")}</div></section>
@@ -3583,6 +3722,7 @@
     ui.nextFeatChoices = {};
     ui.nextFeatureChoices = {};
     ui.nextDomainChoices = {};
+    ui.nextSkillRanks = {};
     ui.nextAbilityIncrease = null;
     ui.levelCursor = null;
     ui.mythicCursor = null;
@@ -3604,7 +3744,8 @@
         attributesMode: "base",
         raceAbility: null,
         attributes: { str: 16, dex: 16, con: companion.path === "lich" ? 0 : 14, int: 10, wis: 10, cha: 10 },
-        skills: Object.fromEntries(DATA.skills.map((skill) => [skill.id, 0])),
+        skills: emptySkillRanks(),
+        legacySkillRanks: emptySkillRanks(),
         normalSteps: [],
         mythicSteps: character.mythicSteps.map((step) => ({ ...step, pathId: null, pathChoices: [], pathPicks: [] })),
         legacyManual: { feats: [], mythic: [...character.legacyManual.mythic] },
@@ -3624,6 +3765,7 @@
     }
     ui.nextClass = null;
     ui.nextAbilityIncrease = null;
+    ui.nextSkillRanks = {};
     ui.levelCursor = null;
     ui.levelDraftKey = null;
     saveStore();
@@ -3653,7 +3795,7 @@
     if (featChoices.length !== featSlots.length || featureChoices.length !== featureSlots.length || domainChoices.length !== domainSlots.length) return;
     if (featChoices.some((choice, index) => {
       const item = featById.get(choice.id);
-      const before = rebuildCharacter({ ...prefix, normalSteps: [...prefix.normalSteps, { level: cursor + 1, classId: selectedClass.id, archetypeId: ui.nextArchetype || null, abilityIncrease: ui.nextAbilityIncrease, featChoices: featChoices.slice(0, index), featureChoices, domainChoices, domainIds: domainChoices.map((choice) => choice.domainId), knownSpellIds: [...ui.nextKnownSpells], source: "user", locked: false }], mythicSteps: prefix.mythicSteps.map((mythicStep) => ({ ...mythicStep, pathPicks: [...mythicStep.pathPicks] })), legacyManual: { feats: [...prefix.legacyManual.feats], mythic: [...prefix.legacyManual.mythic] } });
+      const before = rebuildCharacter({ ...prefix, normalSteps: [...prefix.normalSteps, { level: cursor + 1, classId: selectedClass.id, archetypeId: ui.nextArchetype || null, abilityIncrease: ui.nextAbilityIncrease, featChoices: featChoices.slice(0, index), featureChoices, skillRanks: sanitizeSkillRanks(ui.nextSkillRanks), domainChoices, domainIds: domainChoices.map((choice) => choice.domainId), knownSpellIds: [...ui.nextKnownSpells], source: "user", locked: false }], mythicSteps: prefix.mythicSteps.map((mythicStep) => ({ ...mythicStep, pathPicks: [...mythicStep.pathPicks] })), legacyManual: { feats: [...prefix.legacyManual.feats], mythic: [...prefix.legacyManual.mythic] }, legacySkillRanks: sanitizeSkillRanks(prefix.legacySkillRanks) });
       return !item || !featPoolForSlot(featSlots[index]).some((feat) => feat.id === item.id) || !isParameterizedChoiceEligible(item, choice.params, before, featSlots[index].ignorePrerequisites);
     })) return;
     const featureKeys = new Set();
@@ -3668,12 +3810,20 @@
     })) return;
     if (new Set(domainChoices.map((choice) => choice.domainId)).size !== domainChoices.length
       || domainChoices.some((choice, index) => !domainsForSlot(prefix, selectedClass.id, ui.nextArchetype, domainSlots[index]).some((domain) => domain.id === choice.domainId))) return;
+    const skillCandidate = rebuildCharacter({
+      ...prefix,
+      normalSteps: [...prefix.normalSteps, { level: cursor + 1, classId: selectedClass.id, archetypeId: ui.nextArchetype || null, abilityIncrease: ui.nextAbilityIncrease, featChoices, featureChoices, skillRanks: sanitizeSkillRanks(ui.nextSkillRanks), domainChoices, domainIds: domainChoices.map((choice) => choice.domainId), knownSpellIds: [...ui.nextKnownSpells], source: "user", locked: false }],
+      mythicSteps: prefix.mythicSteps.map((mythicStep) => ({ ...mythicStep, pathPicks: [...mythicStep.pathPicks] })),
+      legacyManual: { feats: [...prefix.legacyManual.feats], mythic: [...prefix.legacyManual.mythic] },
+      legacySkillRanks: sanitizeSkillRanks(prefix.legacySkillRanks)
+    });
+    if (skillRankIssues(prefix, skillCandidate, ui.nextSkillRanks).length) return;
     const spellSpec = knownSpellPickSpec(prefix, selectedClass.id, ui.nextArchetype);
     const spellSlotTotal = Object.values(spellSpec).reduce((sum, count) => sum + count, 0);
     if (ui.nextKnownSpells.length !== spellSlotTotal
       || !Object.entries(spellSpec).every(([level, count]) => ui.nextKnownSpells.filter((id) => spellLevelForClass(spellById.get(id), selectedClass.id, ui.nextArchetype) === Number(level)).length === count)
       || ui.nextKnownSpells.some((id) => !spellPoolForClass(selectedClass.id, ui.nextArchetype, spellLevelForClass(spellById.get(id), selectedClass.id, ui.nextArchetype)).some((spell) => spell.id === id))) return;
-    const step = { level: cursor + 1, classId: selectedClass.id, archetypeId: ui.nextArchetype || null, abilityIncrease: ui.nextAbilityIncrease, featChoices, featureChoices, featIds: featChoices.map((choice) => choice.id), domainChoices, domainIds: domainChoices.map((choice) => choice.domainId), knownSpellIds: [...ui.nextKnownSpells], source: "user", locked: false };
+    const step = { level: cursor + 1, classId: selectedClass.id, archetypeId: ui.nextArchetype || null, abilityIncrease: ui.nextAbilityIncrease, featChoices, featureChoices, skillRanks: sanitizeSkillRanks(ui.nextSkillRanks), featIds: featChoices.map((choice) => choice.id), domainChoices, domainIds: domainChoices.map((choice) => choice.domainId), knownSpellIds: [...ui.nextKnownSpells], source: "user", locked: false };
     if (cursor < character.normalSteps.length) character.normalSteps[cursor] = step;
     else character.normalSteps.push(step);
     character.normalSteps = character.normalSteps.map((item, index) => index > cursor && item.classId === step.classId ? { ...item, archetypeId: step.archetypeId } : item);
@@ -3685,6 +3835,7 @@
     ui.nextFeatChoices = {};
     ui.nextFeatureChoices = {};
     ui.nextDomainChoices = {};
+    ui.nextSkillRanks = {};
     ui.nextAbilityIncrease = null;
     ui.levelCursor = cursor;
     ui.levelDraftKey = null;
@@ -3844,7 +3995,7 @@
   function closeNameModal() { elements.modal.hidden = true; }
 
   function exportSave() {
-    const payload = { app: "Field Manuals WotR", version: 3, save: currentSave() };
+    const payload = { app: "Field Manuals WotR", version: 4, save: currentSave() };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -3910,7 +4061,14 @@
   document.addEventListener("click", (event) => {
     const target = event.target.closest("button, [data-close-modal]");
     if (!target) return;
-    if (target.dataset.view) { ui.view = target.dataset.view; renderAll(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+    if (target.hasAttribute("data-card-expand")) {
+      const wrapper = target.closest(".choice-card-wrap");
+      const expanded = !wrapper?.classList.contains("expanded");
+      wrapper?.classList.toggle("expanded", expanded);
+      target.setAttribute("aria-expanded", String(expanded));
+      target.textContent = expanded ? "收起说明" : "展开说明";
+    }
+    else if (target.dataset.view) { ui.view = target.dataset.view; renderAll(); window.scrollTo({ top: 0, behavior: "smooth" }); }
     else if (target.dataset.character) setCharacter(target.dataset.character);
     else if (target.dataset.roster) { ui.roster = target.dataset.roster; renderRoster(); }
     else if (target.dataset.stage) { ui.stage = target.dataset.stage; renderWorkspace(); }
@@ -3937,11 +4095,11 @@
       character.attributes[target.dataset.ability] = Math.max(min, Math.min(18, character.attributes[target.dataset.ability] + delta));
       saveStore(); renderWorkspace(); renderLiveSheet();
     }
-    else if (target.dataset.skill) {
-      const character = currentCharacter();
-      const id = target.dataset.skill;
-      character.skills[id] = Math.max(0, Math.min(maxSkillRank(character), (character.skills[id] || 0) + Number(target.dataset.delta)));
-      saveStore(); renderWorkspace(); renderLiveSheet();
+    else if (target.dataset.nextSkill) {
+      const id = target.dataset.nextSkill;
+      if (!skillById.has(id)) return;
+      ui.nextSkillRanks[id] = Math.max(0, (Number(ui.nextSkillRanks[id]) || 0) + Number(target.dataset.delta));
+      renderWorkspace();
     }
     else if (target.dataset.levelCursor) { ui.levelCursor = target.dataset.levelCursor === "next" ? null : Number(target.dataset.levelCursor); ui.levelDraftKey = null; renderWorkspace(); }
     else if (target.dataset.nextClass) { ui.nextClass = target.dataset.nextClass; ui.nextArchetype = selectedArchetype(normalPrefix(currentCharacter(), resolvedLevelCursor(currentCharacter())), ui.nextClass); ui.nextFeats = []; ui.nextFeatChoices = {}; ui.nextFeatureChoices = {}; ui.nextDomainChoices = {}; ui.nextDomains = []; ui.nextKnownSpells = []; renderWorkspace(); }

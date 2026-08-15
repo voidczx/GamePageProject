@@ -33,12 +33,17 @@ window.WOTR_DATA = (() => {
   ];
 
   const skills = [
-    { id: "athletics", name: "运动" }, { id: "mobility", name: "灵巧" },
-    { id: "trickery", name: "巧手" }, { id: "stealth", name: "隐匿" },
-    { id: "arcana", name: "知识（神秘）" }, { id: "world", name: "知识（世界）" },
-    { id: "nature", name: "学识（自然）" }, { id: "religion", name: "学识（宗教）" },
-    { id: "perception", name: "察觉" }, { id: "persuasion", name: "说服" },
-    { id: "umd", name: "使用魔法装置" }
+    { id: "athletics", name: "运动", ability: "str", nativeStat: "SkillAthletics" },
+    { id: "mobility", name: "灵巧", ability: "dex", nativeStat: "SkillMobility" },
+    { id: "trickery", name: "巧手", ability: "dex", nativeStat: "SkillThievery" },
+    { id: "stealth", name: "隐匿", ability: "dex", nativeStat: "SkillStealth" },
+    { id: "arcana", name: "知识（神秘）", ability: "int", nativeStat: "SkillKnowledgeArcana" },
+    { id: "world", name: "知识（世界）", ability: "int", nativeStat: "SkillKnowledgeWorld" },
+    { id: "nature", name: "学识（自然）", ability: "wis", nativeStat: "SkillLoreNature" },
+    { id: "religion", name: "学识（宗教）", ability: "wis", nativeStat: "SkillLoreReligion" },
+    { id: "perception", name: "察觉", ability: "wis", nativeStat: "SkillPerception" },
+    { id: "persuasion", name: "说服", ability: "cha", nativeStat: "SkillPersuasion" },
+    { id: "umd", name: "使用魔法装置", ability: "cha", nativeStat: "SkillUseMagicDevice" }
   ];
 
   const classes = [
