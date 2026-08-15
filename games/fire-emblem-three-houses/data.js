@@ -150,21 +150,21 @@ window.FE3H_DATA = (() => {
     },
     {
       id: "wc-12", month: "3月", moon: "孤月节", chapter: 12,
-      title: "To War / Outset of a Power Struggle", mission: "The Battle of Garreg Mach / Garreg Mach 攻防战",
-      objective: "随路线变化", defeat: "主角或路线领袖败退", deployment: "路线相关", fog: false,
-      facts: ["非 Crimson Flower：击败 Edelgard，同时不能让敌军占领防守点。", "非 Crimson Flower 的 Maddening 会在越过北侧行线后持续生成 Pegasus Knight，并在 Edelgard 两侧出现 Demonic Beast。", "Crimson Flower：目标为击败 Rhea；Rhea 与大批单位会在阶段条件满足后于北侧出现。", "本关结束后进入五年后；全员携带武器会自动修满耐久。"],
+      title: "To War", mission: "The Battle of Garreg Mach / 加尔古·玛库防卫战",
+      objective: "击败 Edelgard", defeat: "Byleth 或学级长败退、我军全灭，或敌军占领防守点", deployment: "我方 10 / 敌军 39 / NPC 10", fog: false,
+      facts: ["本数据用于 Azure Moon、Verdant Wind 与 Silver Snow；Crimson Flower 使用独立的 cf-12 进攻战。", "Maddening 在越过北侧触发线后持续生成 Pegasus Knight，并在 Edelgard 两侧出现 Demonic Beast。", "击败 Death Knight 后 Catherine 与 Cyril 的友军会从东侧加入；击败 Hubert 后 Gilbert 与教会兵从西侧加入。", "本关结束后进入五年后；全员携带武器会自动修满耐久。"],
       prep: ["给第 13 章强制出场的本学级成员准备装备", "修正骑士团与副官，不把关键装备留在编外角色身上", "非 CF 路线优先处理 Death Knight 与 Hubert 触发友军增援"],
-      loot: ["非 CF：Death Knight 掉落 Dark Seal", "非 CF Maddening：Hubert 可偷 Prayer Ring", "CF：增援 Archer 掉落 Blessed Bow"],
+      loot: ["Death Knight：Dark Seal", "Maddening 的 Hubert：可偷 Prayer Ring", "战后：全员物品栏内武器耐久自动恢复"],
       zones: [
         {label:"我方起点 / 防守点",type:"start",x:38,y:81,w:25,h:11}, {label:"左炮台",type:"danger",x:8,y:43,w:20,h:12},
         {label:"右炮台",type:"danger",x:72,y:43,w:20,h:12}, {label:"持续增援触发线",type:"trigger",x:34,y:29,w:32,h:10},
         {label:"路线最终目标",type:"boss",x:38,y:6,w:25,h:14}
-      ], source: chapterSource(12, "c")
+      ], source: chapterSource(12, "b")
     }
   ];
 
   const units = [
-    {id:"byleth",name:"贝雷特 / 贝雷丝",english:"Byleth",house:"主角",recruit:"自动加入",role:"高力量全能核心",build:"Archer 命中+20 → Brigand 鬼神一击 → 飞行或格斗终盘",unlocks:["Sword C+：Bane of Monsters","Sword A：Windsweep"],paralogues:["tales_red_canyon"],source:characterSource("byleth")},
+    {id:"byleth",name:"贝雷特 / 贝雷丝",english:"Byleth",house:"主角",recruit:"自动加入",role:"高力量全能核心",build:"Archer 命中+20 → Brigand 鬼神一击 → 飞行或格斗终盘",unlocks:["Sword C+：Bane of Monsters","Sword A：Windsweep"],paralogues:["tales_red_canyon","eternal_guardian"],source:characterSource("byleth")},
     {id:"edelgard",name:"艾黛尔贾特",english:"Edelgard",house:"黑鹫",recruit:"路线锁定",role:"高爆发斧系核心",build:"Brigand → Wyvern Rider → Wyvern Lord；CF 终盘可用 Aymr",unlocks:["Authority C：Battalion Vantage","Aymr：Raging Storm"],paralogues:["insurmountable"],source:characterSource("edelgard")},
     {id:"hubert",name:"修伯特",english:"Hubert",house:"黑鹫",recruit:"路线锁定",role:"暗魔法削弱 / 魔法骑",build:"Mage → Dark Bishop → Dark Knight",unlocks:["Lance budding：Frozen Lance","Reason：Mire Β / Banshee Θ"],paralogues:["darkness_beneath"],source:characterSource("hubert")},
     {id:"ferdinand",name:"菲尔迪南特",english:"Ferdinand",house:"黑鹫",recruit:"Dex 10 + Heavy Armor C",role:"连击枪 / 高回避骑兵",build:"Brigand → Paladin；有资源可转 Wyvern Lord",unlocks:["Lance A：Swift Strikes","Heavy Armor budding：Seal Speed"],paralogues:["retribution"],source:characterSource("ferdinand")},
@@ -235,8 +235,30 @@ window.FE3H_DATA = (() => {
     {id:"ocean_view",name:"An Ocean View",units:["seteth","flayn"],window:"Chapter 9–11",route:"第一部；需 Flayn",reward:"Spear of Assal；Caduceus Staff；两支骑士团",note:"两件 Sacred 装备价值很高；进入前准备飞行或远程手段处理分散目标。",source:paralogueSource("an_ocean_view")},
     {id:"oil_water",name:"Oil and Water",units:["hanneman","manuela"],window:"Chapter 8–11",route:"第一部；需 Hanneman 或 Manuela",reward:"Experience Gem；Rapier；两支骑士团",note:"两名教师分处地图两侧，先明确保护与会合路线。",source:paralogueSource("oil_and_water")},
     {id:"sword_shield",name:"Sword and Shield of Seiros",units:["alois","shamir"],window:"Chapter 7–11",route:"第一部；需 Alois 或 Shamir",reward:"Seraph Robe；Large Bullion；两支骑士团",note:"保护港口与友军，移动力和远程火力能减少漏怪。",source:paralogueSource("sword_and_shield_of_seiros")},
-    {id:"secret_merchant",name:"The Secret Merchant",units:["anna","jeritza"],window:"Chapter 9–11；CF 13–17",route:"DLC；SS 不可用",reward:"Secret Transport Force",note:"其他路线由 Anna 开启；CF 第二部还要求 Jeritza 存活。",source:paralogueSource("the_secret_merchant")}
-  ];
+    {id:"secret_merchant",name:"The Secret Merchant",units:["anna","jeritza"],window:"Chapter 9–11；CF 13–17",route:"DLC；SS 不可用",reward:"Secret Transport Force",note:"其他路线由 Anna 开启；CF 第二部还要求 Jeritza 存活。",source:paralogueSource("the_secret_merchant")},
+    {id:"eternal_guardian",name:"Eternal Guardian",units:["byleth"],window:"Chapter 16–18 SS / 19 VW / 21 AM",route:"非 Crimson Flower；需 Rhea C 支援",reward:"Seiros Shield；Spirit Dust",note:"击败四名敌将；Altered Golem 完整破盾可取得 Mythril。",source:paralogueSource("eternal_guardian")}
+  ].map((entry) => {
+    const details = window.FE3H_PARALOGUE_DETAILS?.[entry.id];
+    if (!details) return entry;
+    return {
+      ...entry,
+      ...details,
+      source: details.source || entry.source,
+      battle: { ...details.battle, source: details.battle?.source || details.source || entry.source }
+    };
+  });
+
+  const arcNames = { AM: "AZURE MOON", VW: "VERDANT WIND", CF: "CRIMSON FLOWER", SS: "SILVER SNOW" };
+  const routeSources = {
+    AM: window.FE3H_ROUTE_BATTLES_AM_VW?.AM || [],
+    VW: window.FE3H_ROUTE_BATTLES_AM_VW?.VW || [],
+    CF: window.FE3H_ROUTE_BATTLES_CF_SS?.CF || [],
+    SS: window.FE3H_ROUTE_BATTLES_CF_SS?.SS || []
+  };
+  const routeBattles = Object.fromEntries(Object.entries(routeSources).map(([route, entries]) => [
+    route,
+    entries.map((battle) => ({ ...battle, route, arc: arcNames[route] }))
+  ]));
 
   const routes = {
     AM: {name:"Azure Moon / 青狮",leader:"Dimitri",chapters:["13 Hunting by Daybreak","14 Protecting Garreg Mach","15 Ambush at Ailell","16 The Great Bridge Coup","17 To War at Gronder","18 Reclaiming the Capital","19 Saving Derdriu","20 Taking Fort Merceus","21 Assault on Enbarr","22 Clash at the Imperial Capital"],warning:"Chapter 13 强制使用原青狮成员；第一部结束前必须给自动出场角色留装备与等级。"},
@@ -256,5 +278,5 @@ window.FE3H_DATA = (() => {
     {title:"外传奖励条件",body:"第一部双人外传通常只需其中一人即可开启，但遗产或骑士团奖励可能要求对应角色已正式招募；第二部双人外传通常要求两人都在队且存活。"}
   ];
 
-  return { battles, units, paralogues, routes, mechanics };
+  return { battles, routeBattles, units, paralogues, routes, mechanics };
 })();

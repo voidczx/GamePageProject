@@ -153,6 +153,181 @@ a { color: inherit; }
 
 .map-wrap { padding: 16px; background: #111411; }
 .map-note { margin: 0 0 9px; display: flex; justify-content: space-between; gap: 15px; color: var(--muted); font-size: 10px; }
+.map-toolbar { margin-bottom: 9px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.map-toolbar .map-note { flex: 1; margin: 0; }
+.map-tools, .map-layer-switch, .map-semantic-switch { display: flex; flex-wrap: wrap; gap: 5px; }
+.map-tools button {
+  min-height: 29px;
+  padding: 4px 8px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--panel);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 10px;
+}
+.map-tools button:hover, .map-tools button.active { border-color: var(--gold); color: var(--gold); }
+.map-data-status { padding: 2px 6px; border: 1px solid currentColor; border-radius: 999px; font-size: 9px; white-space: nowrap; }
+.map-data-status.complete { color: var(--green); }
+.map-data-status.pending { color: #bd9361; }
+.grid-map-viewport { padding: 8px; border: 1px solid var(--line-strong); background: #080a08; overflow: auto; }
+.grid-map-canvas {
+  position: relative;
+  width: min(100%, calc(760px * var(--map-aspect)));
+  margin: 0 auto;
+  aspect-ratio: var(--map-aspect);
+  background: #050705;
+  isolation: isolate;
+  cursor: crosshair;
+}
+.grid-map-layer { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+.grid-map-layer[hidden] { display: none; }
+.reference-layer { object-fit: contain; }
+.grid-map-canvas.fog::after {
+  content: "FOG OF WAR · 基础视野 2 格";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  padding: 10px;
+  border: 1px dashed rgba(230,235,230,.3);
+  background: var(--fog);
+  color: rgba(241,241,234,.54);
+  font: 700 10px ui-monospace, "Cascadia Code", monospace;
+  pointer-events: none;
+}
+.map-hotspot-layer { position: absolute; inset: 0; z-index: 4; }
+.map-semantic-tile-layer { position: absolute; inset: 0; z-index: 2; display: grid; }
+.map-semantic-tile {
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  cursor: crosshair;
+}
+.map-semantic-tile:not(.empty):hover, .map-semantic-tile.selected { outline: 1px solid rgba(212,176,94,.85); outline-offset: -1px; background: rgba(212,176,94,.13); }
+.map-semantic-tile.empty { pointer-events: none; }
+.map-semantic-entity-layer { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
+.map-semantic-marker {
+  position: absolute;
+  min-width: 16px;
+  min-height: 16px;
+  padding: 0;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  background: rgba(13,15,13,.42);
+  color: var(--muted);
+  cursor: pointer;
+  pointer-events: auto;
+}
+.map-semantic-marker:hover, .map-semantic-marker:focus-visible, .map-semantic-marker.selected { z-index: 9; outline: 2px solid currentColor; outline-offset: 1px; background: rgba(13,15,13,.92); }
+.map-semantic-marker.player { color: var(--blue); }
+.map-semantic-marker.enemy { color: var(--red); }
+.map-semantic-marker.ally, .map-semantic-marker.npc { color: var(--green); }
+.map-semantic-marker.treasure { color: var(--violet); }
+.map-semantic-marker.event { color: var(--gold); border-style: dashed; }
+.map-semantic-marker.event.ambush { color: #e17462; }
+.map-semantic-marker.commander { box-shadow: 0 0 0 2px rgba(212,97,85,.32); }
+.map-semantic-symbol {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: clamp(15px, 2.2vw, 22px);
+  height: clamp(15px, 2.2vw, 22px);
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  background: #0d0f0d;
+  display: grid;
+  place-items: center;
+  transform: translate(-50%, -50%);
+  font: 700 8px ui-monospace, "Cascadia Code", monospace;
+}
+.map-semantic-title {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + 15px);
+  z-index: 10;
+  width: max-content;
+  max-width: 210px;
+  padding: 3px 5px;
+  border: 1px solid currentColor;
+  background: rgba(13,15,13,.96);
+  color: var(--text);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%);
+  font-size: 9px;
+  line-height: 1.3;
+}
+.map-semantic-detail { display: none; }
+.grid-map-canvas.show-labels .map-semantic-marker .map-semantic-title, .map-semantic-marker:hover .map-semantic-title, .map-semantic-marker:focus-visible .map-semantic-title, .map-semantic-marker.selected .map-semantic-title { opacity: 1; }
+.map-semantic-tile > .map-semantic-title, .map-semantic-tile > .map-semantic-detail { display: none; }
+.map-hotspot {
+  position: absolute;
+  min-width: 18px;
+  min-height: 18px;
+  padding: 0;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  background: rgba(13,15,13,.18);
+  color: var(--muted);
+  cursor: pointer;
+}
+.map-hotspot:hover, .map-hotspot:focus-visible, .map-hotspot.selected { z-index: 6; outline: 2px solid currentColor; outline-offset: 1px; background: rgba(13,15,13,.72); }
+.map-hotspot-symbol {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 22px;
+  height: 22px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  background: #0d0f0d;
+  display: grid;
+  place-items: center;
+  transform: translate(-50%, -50%);
+  font: 700 9px ui-monospace, "Cascadia Code", monospace;
+}
+.map-hotspot-copy {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + 16px);
+  z-index: 8;
+  width: max-content;
+  max-width: 210px;
+  padding: 4px 6px;
+  border: 1px solid currentColor;
+  background: rgba(13,15,13,.96);
+  color: var(--text);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%);
+  font-size: 9px;
+  line-height: 1.35;
+}
+.grid-map-canvas.show-labels .map-hotspot-copy, .map-hotspot:hover .map-hotspot-copy, .map-hotspot:focus-visible .map-hotspot-copy, .map-hotspot.selected .map-hotspot-copy { opacity: 1; }
+.map-hotspot.start { color: var(--blue); }
+.map-hotspot.boss { color: var(--red); }
+.map-hotspot.trigger { color: var(--gold); }
+.map-hotspot.loot { color: var(--violet); }
+.map-hotspot.ally { color: var(--green); }
+.map-hotspot.danger { color: #dc8269; border-style: dashed; }
+.map-inspector { min-height: 48px; margin-top: 9px; padding: 8px 10px; border-left: 2px solid var(--gold); background: var(--panel); display: grid; gap: 2px; }
+.map-inspector strong { color: var(--gold); font-size: 10px; }
+.map-inspector span { color: #d7d9d3; font-size: 11px; }
+.map-script-details { margin-top: 8px; border: 1px solid var(--line); background: rgba(13,15,13,.58); }
+.map-script-details summary { padding: 8px 10px; color: var(--gold); cursor: pointer; font-size: 10px; }
+.map-script-details[open] summary { border-bottom: 1px solid var(--line); }
+.map-script-details section { padding: 8px 10px; }
+.map-script-details section + section { border-top: 1px solid var(--line); }
+.map-script-details h4 { margin: 0 0 6px; color: var(--muted); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; }
+.map-script-details ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 5px; }
+.map-script-details li { padding-left: 8px; border-left: 1px solid var(--line-strong); display: grid; gap: 1px; }
+.map-script-details li strong { color: var(--text); font-size: 10px; }
+.map-script-details li span { color: #c8cbc4; font-size: 9px; line-height: 1.45; }
+.map-attribution { margin: 8px 0 0; color: var(--muted); font-size: 9px; }
+.map-attribution a { text-underline-offset: 2px; }
 .battle-map {
   position: relative;
   min-height: 390px;
@@ -244,8 +419,11 @@ a { color: inherit; }
 .advice-mark { display: inline-block; margin-right: 5px; color: var(--gold); font-size: 9px; }
 
 .paralogue-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.paralogue-detail { margin-bottom: 18px; scroll-margin-top: 84px; }
 .paralogue-card { padding: 15px; }
+.paralogue-card.current { border-color: var(--gold); box-shadow: inset 3px 0 0 var(--gold); }
 .paralogue-card.fog-card { border-color: #667066; }
+.paralogue-card.current.fog-card { border-color: var(--gold); }
 .paralogue-card h2 { margin: 0 0 3px; font-size: 16px; }
 .paralogue-meta { display: flex; flex-wrap: wrap; gap: 5px; margin: 9px 0; }
 .tag { padding: 3px 6px; border: 1px solid var(--line); color: var(--muted); font-size: 9px; }
@@ -259,6 +437,8 @@ a { color: inherit; }
 .route-chapters { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
 .route-chapters li { padding: 6px 0; border-bottom: 1px solid var(--line); color: #d6d8d3; font-size: 11px; }
 .route-chapters li:last-child { border-bottom: 0; }
+.route-chapters button { width: 100%; padding: 0; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.route-chapters button:hover, .route-chapters button:focus-visible { color: var(--gold); }
 .mechanic-card p { margin: 0; color: #d5d7d1; font-size: 12px; }
 
 .search-empty { padding: 70px 10px; color: var(--muted); text-align: center; }
@@ -295,6 +475,9 @@ a { color: inherit; }
   .metric:nth-child(2) { border-right: 0; }
   .metric:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
   .battle-map { min-height: 330px; }
+  .map-toolbar { align-items: stretch; flex-direction: column; }
+  .map-toolbar .map-note { display: grid; gap: 2px; }
+  .map-tools { justify-content: space-between; }
   .unit-grid, .paralogue-grid, .route-grid, .mechanic-grid, .intel-column { grid-template-columns: 1fr; }
   .battle-index-item { grid-template-columns: 72px minmax(0,1fr); }
   .battle-index-item .action { grid-column: 1 / -1; }
@@ -307,6 +490,8 @@ a { color: inherit; }
   .battle-titlebar { padding: 15px; }
   .battle-titlebar h2 { font-size: 21px; }
   .map-wrap { padding: 10px; }
+  .grid-map-viewport { padding: 4px; }
+  .map-hotspot-copy { max-width: 150px; }
   .battle-map { min-height: 300px; }
   .map-zone { min-width: 46px; padding: 4px; font-size: 9px; }
   .sheet-section { padding: 15px; }

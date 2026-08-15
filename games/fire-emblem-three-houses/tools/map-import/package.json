@@ -1,0 +1,14 @@
+{
+  "name": "fe3h-map-import",
+  "version": "0.1.0",
+  "private": true,
+  "type": "commonjs",
+  "main": "index.js",
+  "bin": {
+    "fe3h-map-import": "cli.js",
+    "fe3h-map-import-all": "batch.js"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  }
+}
