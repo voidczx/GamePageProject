@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://field-manuals.example/schemas/wotr/snapshot.schema.json",
+  "title": "Stable Wrath of the Righteous imported data snapshot",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "snapshotId",
+    "gameId",
+    "gameVersion",
+    "contentVersion",
+    "provenance",
+    "hashes",
+    "diagnostics",
+    "definitions",
+    "choicePools",
+    "progressions",
+    "archetypePatches"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "snapshotId": { "type": "string" },
+    "gameId": { "const": "pathfinder-wrath-of-the-righteous" },
+    "gameVersion": { "type": "string" },
+    "contentVersion": { "type": "string" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "provenance": {
+      "type": "object",
+      "required": ["importer", "sources"],
+      "properties": {
+        "importer": {
+          "type": "object",
+          "required": ["name", "version"],
+          "properties": { "name": { "type": "string" }, "version": { "type": "string" } }
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "kind", "version", "priority", "byteSha256", "semanticSha256", "records"]
+          }
+        }
+      }
+    },
+    "hashes": {
+      "type": "object",
+      "required": ["dataSha256", "snapshotSha256"],
+      "properties": {
+        "dataSha256": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "snapshotSha256": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+      }
+    },
+    "diagnostics": {
+      "type": "object",
+      "required": ["missingLocalization"],
+      "properties": { "missingLocalization": { "type": "array" } }
+    },
+    "definitions": {
+      "type": "object",
+      "required": ["feats", "classes", "spells", "abilities", "domains", "mythic"],
+      "properties": {
+        "feats": { "type": "array" },
+        "classes": { "type": "array" },
+        "spells": { "type": "array" },
+        "abilities": { "type": "array" },
+        "domains": { "type": "array" },
+        "mythic": { "type": "array" }
+      }
+    },
+    "choicePools": { "type": "array" },
+    "progressions": { "type": "array" },
+    "archetypePatches": { "type": "array" }
+  }
+}

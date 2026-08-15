@@ -1,0 +1,65 @@
+{
+  "dumpSchemaVersion": 1,
+  "definitions": [
+    {
+      "id": "power-attack",
+      "guid": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "category": "feats",
+      "blueprintType": "BlueprintFeature",
+      "nameKey": "feat.name",
+      "descriptionKey": "feat.description",
+      "requirements": { "all": [{ "stat": "strength", "minimum": 13 }] }
+    },
+    {
+      "id": "fighter",
+      "guid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "category": "classes",
+      "blueprintType": "BlueprintCharacterClass",
+      "nameKey": "class.name"
+    },
+    {
+      "id": "fixture-archetype",
+      "guid": "cccccccccccccccccccccccccccccccc",
+      "category": "classes",
+      "blueprintType": "BlueprintArchetype",
+      "nameKey": "archetype.name"
+    }
+  ],
+  "choicePools": [
+    {
+      "id": "basic-feats",
+      "categories": ["feats"],
+      "options": ["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"]
+    }
+  ],
+  "progressions": [
+    {
+      "id": "fighter-progression",
+      "ownerGuid": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "axis": "classLevel",
+      "levels": [
+        {
+          "level": 1,
+          "slots": [
+            { "id": "fighter-1-feat", "order": 0, "poolId": "basic-feats" }
+          ]
+        }
+      ]
+    }
+  ],
+  "archetypePatches": [
+    {
+      "id": "fixture-archetype-patch",
+      "archetypeGuid": "cccccccccccccccccccccccccccccccc",
+      "targetProgressionId": "fighter-progression",
+      "operations": [
+        {
+          "order": 0,
+          "op": "add-grant",
+          "target": "level:1",
+          "definitionGuids": ["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"]
+        }
+      ]
+    }
+  ]
+}

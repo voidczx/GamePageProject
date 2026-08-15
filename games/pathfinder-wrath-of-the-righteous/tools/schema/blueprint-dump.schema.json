@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://field-manuals.example/schemas/wotr/blueprint-dump.schema.json",
+  "title": "Normalized Wrath of the Righteous Blueprint dump",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["dumpSchemaVersion", "definitions"],
+  "$defs": {
+    "definitionCategory": {
+      "enum": ["feats", "classes", "spells", "abilities", "domains", "mythic"]
+    },
+    "jsonValue": {},
+    "definition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["guid", "id", "category"],
+      "properties": {
+        "guid": { "type": "string", "minLength": 1 },
+        "id": { "type": "string", "minLength": 1 },
+        "category": { "$ref": "#/$defs/definitionCategory" },
+        "blueprintType": { "type": "string" },
+        "internalName": { "type": "string" },
+        "definitionType": { "type": "string" },
+        "nameKey": { "type": "string" },
+        "descriptionKey": { "type": "string" },
+        "aliases": { "type": "array", "uniqueItems": true, "items": { "type": "string" } },
+        "tags": { "type": "array", "uniqueItems": true, "items": { "type": "string" } },
+        "requirements": { "$ref": "#/$defs/jsonValue" },
+        "data": { "$ref": "#/$defs/jsonValue" }
+      }
+    },
+    "poolOption": {
+      "oneOf": [
+        { "type": "string", "minLength": 1 },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["definitionGuid"],
+          "properties": {
+            "definitionGuid": { "type": "string", "minLength": 1 },
+            "requirements": { "$ref": "#/$defs/jsonValue" },
+            "data": { "$ref": "#/$defs/jsonValue" }
+          }
+        }
+      ]
+    },
+    "choicePool": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "categories"],
+      "anyOf": [{ "required": ["options"] }, { "required": ["query"] }],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "labelKey": { "type": "string" },
+        "categories": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/definitionCategory" }
+        },
+        "options": { "type": "array", "items": { "$ref": "#/$defs/poolOption" } },
+        "query": { "$ref": "#/$defs/jsonValue" },
+        "requirements": { "$ref": "#/$defs/jsonValue" },
+        "data": { "$ref": "#/$defs/jsonValue" }
+      }
+    },
+    "slot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "order", "poolId"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "order": { "type": "integer" },
+        "poolId": { "type": "string", "minLength": 1 },
+        "count": { "type": "integer", "minimum": 1, "default": 1 },
+        "required": { "type": "boolean", "default": true },
+        "scope": { "enum": ["permanent", "restLoadout", "runtimeToggle", "derived"] },
+        "owner": { "type": "string" },
+        "labelKey": { "type": "string" },
+        "requirements": { "$ref": "#/$defs/jsonValue" },
+        "effects": { "type": "array", "items": { "$ref": "#/$defs/jsonValue" } },
+        "data": { "$ref": "#/$defs/jsonValue" }
+      }
+    },
+    "progression": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "ownerGuid", "levels"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "ownerGuid": { "type": "string", "minLength": 1 },
+        "axis": { "type": "string", "default": "classLevel" },
+        "maxLevel": { "type": "integer", "minimum": 1 },
+        "levels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["level", "slots"],
+            "properties": {
+              "level": { "type": "integer", "minimum": 0 },
+              "slots": { "type": "array", "items": { "$ref": "#/$defs/slot" } },
+              "grants": { "type": "array", "uniqueItems": true, "items": { "type": "string" } },
+              "data": { "$ref": "#/$defs/jsonValue" }
+            }
+          }
+        },
+        "data": { "$ref": "#/$defs/jsonValue" }
+      }
+    },
+    "patchOperation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["order", "op", "target"],
+      "properties": {
+        "order": { "type": "integer" },
+        "op": {
+          "enum": ["add-grant", "add-slot", "override-progression", "remove-slot", "replace-slot", "restrict-pool"]
+        },
+        "target": { "type": "string", "minLength": 1 },
+        "poolId": { "type": "string" },
+        "replacementPoolId": { "type": "string" },
+        "level": { "type": "integer", "minimum": 0 },
+        "slot": { "$ref": "#/$defs/slot" },
+        "definitionGuids": { "type": "array", "uniqueItems": true, "items": { "type": "string" } },
+        "value": { "$ref": "#/$defs/jsonValue" },
+        "requirements": { "$ref": "#/$defs/jsonValue" }
+      }
+    },
+    "archetypePatch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "archetypeGuid", "targetProgressionId", "operations"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "archetypeGuid": { "type": "string", "minLength": 1 },
+        "targetProgressionId": { "type": "string", "minLength": 1 },
+        "operations": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/patchOperation" } }
+      }
+    }
+  },
+  "properties": {
+    "dumpSchemaVersion": { "const": 1 },
+    "definitions": { "type": "array", "items": { "$ref": "#/$defs/definition" } },
+    "choicePools": { "type": "array", "items": { "$ref": "#/$defs/choicePool" } },
+    "progressions": { "type": "array", "items": { "$ref": "#/$defs/progression" } },
+    "archetypePatches": { "type": "array", "items": { "$ref": "#/$defs/archetypePatch" } }
+  }
+}

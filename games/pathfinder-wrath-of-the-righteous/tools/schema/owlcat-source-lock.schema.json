@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/wotr/owlcat-source-lock.schema.json",
+  "title": "Pathfinder: Wrath of the Righteous Owlcat source lock",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "gameId", "steamBuild", "expectedGameVersion", "paths", "hashes", "roots", "options"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "gameId": { "type": "string", "minLength": 1 },
+    "steamBuild": { "type": "string", "pattern": "^[0-9]+$" },
+    "expectedGameVersion": { "type": "string", "minLength": 1 },
+    "paths": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["blueprints", "cheatdata", "localization", "versionInfo"],
+      "properties": {
+        "blueprints": { "type": "string" },
+        "cheatdata": { "type": "string" },
+        "localization": { "type": "string" },
+        "versionInfo": { "type": "string" }
+      }
+    },
+    "hashes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["blueprints", "cheatdata", "localization", "versionInfo"],
+      "properties": {
+        "blueprints": { "$ref": "#/$defs/hash" },
+        "cheatdata": { "$ref": "#/$defs/hash" },
+        "localization": { "$ref": "#/$defs/hash" },
+        "versionInfo": { "$ref": "#/$defs/hash" }
+      }
+    },
+    "roots": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "guid"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "guid": { "$ref": "#/$defs/guid" }
+        }
+      }
+    },
+    "options": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "guidIndexScope": { "enum": ["loaded", "full"] },
+        "includeAllSpellLists": { "type": "boolean" },
+        "includeClassCatalog": { "type": "boolean" },
+        "includeMythicClasses": { "type": "boolean" },
+        "includeProgressionFeatures": { "type": "boolean" },
+        "includeArchetypeFeatures": { "type": "boolean" },
+        "mechanicsClosure": { "type": "boolean" }
+      }
+    }
+  },
+  "$defs": {
+    "guid": { "type": "string", "pattern": "^[0-9a-fA-F]{32}$" },
+    "hash": { "type": "string", "pattern": "^sha256:[0-9a-fA-F]{64}$" }
+  }
+}

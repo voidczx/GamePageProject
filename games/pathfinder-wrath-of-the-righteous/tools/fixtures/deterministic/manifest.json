@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "snapshotId": "deterministic-fixture",
+  "gameId": "pathfinder-wrath-of-the-righteous",
+  "gameVersion": "fixture",
+  "contentVersion": "1",
+  "sources": [
+    {
+      "id": "fixture-blueprints",
+      "kind": "blueprints",
+      "path": "blueprints.json",
+      "version": "1",
+      "priority": 0
+    },
+    {
+      "id": "fixture-localization",
+      "kind": "localization",
+      "path": "localization.json",
+      "version": "1",
+      "priority": 0
+    }
+  ],
+  "localization": {
+    "primaryLocale": "zhCN",
+    "fallbackLocales": ["enUS"]
+  }
+}

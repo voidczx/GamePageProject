@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://field-manuals.example/schemas/wotr/localization-dump.schema.json",
+  "title": "Normalized Wrath of the Righteous localization dump",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["dumpSchemaVersion", "locales"],
+  "properties": {
+    "dumpSchemaVersion": { "const": 1 },
+    "locales": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": { "type": "string" }
+      }
+    }
+  }
+}

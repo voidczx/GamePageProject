@@ -1,0 +1,17 @@
+{
+  "dumpSchemaVersion": 1,
+  "locales": {
+    "enUS": {
+      "archetype.name": "Fixture Archetype",
+      "class.name": "Fighter",
+      "feat.description": "Trade accuracy for damage.",
+      "feat.name": "Power Attack"
+    },
+    "zhCN": {
+      "archetype.name": "测试原型",
+      "class.name": "战士",
+      "feat.description": "牺牲命中换取伤害。",
+      "feat.name": "猛力攻击"
+    }
+  }
+}

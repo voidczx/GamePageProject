@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "gameId": "pathfinder-wrath-of-the-righteous",
+  "steamBuild": "20212986",
+  "expectedGameVersion": "2.7.0x",
+  "paths": {
+    "blueprints": "blueprints.zip",
+    "cheatdata": "Bundles/cheatdata.json",
+    "localization": "Wrath_Data/StreamingAssets/Localization/zhCN.json",
+    "versionInfo": "Wrath_Data/StreamingAssets/Version.info"
+  },
+  "hashes": {
+    "blueprints": "sha256:be61c9b723ef06558da8d7cfc7f0c7ea869f60ba9952ebbbbd116cf681863ea5",
+    "cheatdata": "sha256:30922709a5a860479b0bf208bee96d50261f64badc9b8557dbb114bec243f7b7",
+    "localization": "sha256:3eb335714ba58bf784ada8093b34a5698177ecdd88e2598c5a04fae5e880773d",
+    "versionInfo": "sha256:4b4376fc0615ec7d8bb056b11da19d55a74fed18e0b08a60134701e9039791ee"
+  },
+  "roots": [
+    {
+      "id": "blueprint-root",
+      "guid": "2d77316c72b9ed44f888ceefc2a131f6"
+    },
+    {
+      "id": "basic-feats",
+      "guid": "247a4068296e8be42890143f451b4b45"
+    },
+    {
+      "id": "mythic-abilities",
+      "guid": "ba0e5a900b775be4a99702f1ed08914d"
+    },
+    {
+      "id": "mythic-feats",
+      "guid": "9ee0f6745f555484299b0a1563b99d81"
+    },
+    {
+      "id": "cavalier-orders",
+      "guid": "d710e30ea20240247ad87ad86bcd50f2"
+    },
+    {
+      "id": "domains",
+      "guid": "48525e5da45c9c243a343fc6545dbdb9"
+    },
+    {
+      "id": "backgrounds",
+      "guid": "f926dabeee7f8a54db8f2010b323383c"
+    }
+  ],
+  "options": {
+    "guidIndexScope": "loaded",
+    "includeAllSpellLists": true,
+    "includeClassCatalog": true,
+    "includeMythicClasses": true,
+    "includeProgressionFeatures": true,
+    "includeArchetypeFeatures": true,
+    "includeEquipmentCatalog": true,
+    "mechanicsClosure": true
+  }
+}

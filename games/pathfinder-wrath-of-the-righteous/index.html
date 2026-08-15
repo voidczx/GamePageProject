@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#12100d">
+  <meta name="description" content="《开拓者 - 正义之怒》角色构筑模拟器、专长与神话能力百科、神话道途解锁及队友任务选择后果。">
+  <title>开拓者 - 正义之怒 | 骑士指挥官构筑档案</title>
+  <link rel="stylesheet" href="../../assets/css/guide-shell.css">
+  <link rel="stylesheet" href="style.css">
+  <script src="data.js" defer></script>
+  <script src="expanded-data.js" defer></script>
+  <script src="choice-data.js" defer></script>
+  <script src="mythic-data.js" defer></script>
+  <script src="generated/wotr-2.7.0x.site.js" defer></script>
+  <script src="owlcat-runtime.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="guide-home-link" href="../../" aria-label="返回攻略库">← 攻略库</a>
+
+  <header class="command-header">
+    <a class="command-brand" href="#top" aria-label="返回页面顶部">
+      <span class="brand-sigil" aria-hidden="true">W</span>
+      <span><strong>骑士指挥官档案</strong><small>WRATH OF THE RIGHTEOUS / BUILD ARCHIVE</small></span>
+    </a>
+    <nav class="primary-nav" id="primary-nav" aria-label="页面功能">
+      <button class="active" type="button" data-view="builder">构筑模拟</button>
+      <button type="button" data-view="feats">规则百科</button>
+      <button type="button" data-view="paths">神话道途</button>
+      <button type="button" data-view="quests">队友任务</button>
+    </nav>
+    <div class="version-mark"><span>2026.07</span><span>LOCAL</span></div>
+  </header>
+
+  <section class="save-bar" aria-label="本地构筑存档">
+    <div class="save-identity">
+      <span class="save-light" aria-hidden="true"></span>
+      <label for="save-select">当前存档</label>
+      <select id="save-select" aria-label="选择本地存档"></select>
+      <span class="save-status" id="save-status" role="status">已保存在此设备</span>
+    </div>
+    <div class="save-actions">
+      <button type="button" id="new-save">＋ 新建</button>
+      <button type="button" id="duplicate-save">复制</button>
+      <button type="button" id="rename-save">重命名</button>
+      <button class="danger-action" type="button" id="delete-save">删除</button>
+    </div>
+  </section>
+
+  <main id="top">
+    <section class="page-view active" data-page="builder">
+      <div class="builder-shell">
+        <aside class="roster-panel">
+          <div class="panel-heading">
+            <div><span class="overline">PARTY ROSTER</span><h2>同行者</h2></div>
+            <span id="roster-count"></span>
+          </div>
+          <div class="roster-filter" id="roster-filter" role="group" aria-label="队友筛选">
+            <button class="active" type="button" data-roster="all">全部</button>
+            <button type="button" data-roster="core">常规</button>
+            <button type="button" data-roster="path">道途</button>
+          </div>
+          <div class="roster-list" id="roster-list"></div>
+        </aside>
+
+        <section class="level-panel">
+          <header class="character-banner" id="character-banner"></header>
+          <div class="mode-strip" id="mode-strip"></div>
+
+          <nav class="creation-steps" id="creation-steps" aria-label="车卡步骤">
+            <button class="active" type="button" data-stage="race"><span>01</span>种族</button>
+            <button type="button" data-stage="background"><span>02</span>出身</button>
+            <button type="button" data-stage="faith"><span>03</span>阵营 / 信仰</button>
+            <button type="button" data-stage="attributes"><span>04</span>属性</button>
+            <button type="button" data-stage="level"><span>05</span>升级</button>
+            <button type="button" data-stage="mythic"><span>06</span>神话</button>
+          </nav>
+
+          <div class="choice-workspace" id="choice-workspace" aria-live="polite"></div>
+        </section>
+
+        <aside class="sheet-panel">
+          <div class="panel-heading">
+            <div><span class="overline">LIVE SHEET</span><h2>实时角色卡</h2></div>
+            <span id="sheet-validity"></span>
+          </div>
+          <div id="live-sheet"></div>
+          <div class="sheet-actions">
+            <button type="button" id="export-save">导出当前存档</button>
+            <label class="import-action" for="import-save">导入存档<input id="import-save" type="file" accept="application/json"></label>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="page-view" data-page="feats" hidden>
+      <header class="section-hero">
+        <div><p class="eyebrow">RULE COMPENDIUM / INSTALLED BLUEPRINTS</p><h1>规则与能力百科</h1><p>专长、职业与原型能力、道途能力、领域能力、法术和类法术条目均来自当前安装版蓝图，并与构筑模拟器共用同一套 GUID、前置与选择池。</p></div>
+        <dl><div><dt>专长 / 神话</dt><dd id="feat-total">0</dd></div><div><dt>能力 / 法术</dt><dd id="mythic-total">0</dd></div></dl>
+      </header>
+      <div class="catalog-toolbar">
+        <label class="catalog-search"><span>搜索规则</span><input id="feat-search" type="search" placeholder="名称、效果或前置条件"></label>
+        <div class="segmented" id="feat-kind"><button class="active" type="button" data-kind="feat">普通专长</button><button type="button" data-kind="ability">神话能力</button><button type="button" data-kind="mythic-feat">神话专长</button><button type="button" data-kind="class-feature">职业 / 原型</button><button type="button" data-kind="path-feature">道途能力</button><button type="button" data-kind="domain-feature">领域能力</button><button type="button" data-kind="spell">法术</button><button type="button" data-kind="special-ability">类法术 / 特殊</button></div>
+        <label class="eligibility-toggle"><input id="eligible-only" type="checkbox"><span>只看当前可选</span></label>
+      </div>
+      <div class="catalog-layout">
+        <aside class="category-rail" id="feat-categories"></aside>
+        <div class="catalog-list" id="feat-list"></div>
+        <aside class="catalog-detail" id="feat-detail"></aside>
+      </div>
+    </section>
+
+    <section class="page-view" data-page="paths" hidden>
+      <header class="section-hero">
+        <div><p class="eyebrow">MYTHIC ASCENSION / RANK 3 & 8</p><h1>十条超凡道路</h1><p>先决定怎样得到力量，再决定成为什么。主道途在神话 3 阶选择，后期道途在神话 8 阶改道。</p></div>
+        <dl><div><dt>三阶主道途</dt><dd>6</dd></div><div><dt>后期道途</dt><dd>4</dd></div></dl>
+      </header>
+      <div class="path-layout">
+        <div class="path-list" id="path-list"></div>
+        <article class="path-detail" id="path-detail"></article>
+      </div>
+    </section>
+
+    <section class="page-view" data-page="quests" hidden>
+      <header class="section-hero quest-hero">
+        <div><p class="eyebrow">COMPANION FLAGS / SPOILER HEAVY</p><h1>队友任务与选择后果</h1><p>按章节整理触发节点、强制条件与会改变结局的关键选择。你的记录随当前本地存档保存。</p></div>
+        <label class="catalog-search"><span>搜索队友或任务</span><input id="quest-search" type="search" placeholder="席拉、信任、第四章……"></label>
+      </header>
+      <div class="quest-layout">
+        <aside class="quest-rail" id="quest-rail"></aside>
+        <div class="quest-content" id="quest-content"></div>
+      </div>
+    </section>
+
+    <section class="source-band" aria-labelledby="source-title">
+      <div><p class="eyebrow">DATA BASELINE</p><h2 id="source-title">规则基线与校准</h2></div>
+      <div class="source-grid" id="source-grid"></div>
+      <p>构筑规则与百科目录以本机《开拓者 - 正义之怒》2.7.0x（Steam build 20212986）蓝图、中文本地化和法表为主数据源；攻略资料仅用于说明剧情条件。装备、临时增益与战斗目标条件不属于升级选择历史。本页为非官方粉丝工具。</p>
+    </section>
+  </main>
+
+  <div class="modal-backdrop" id="name-modal" hidden>
+    <form class="name-modal" id="name-form">
+      <span class="overline">LOCAL ARCHIVE</span>
+      <h2 id="name-modal-title">新建存档</h2>
+      <label for="save-name-input">存档名称</label>
+      <input id="save-name-input" maxlength="32" autocomplete="off" required>
+      <div><button type="button" data-close-modal>取消</button><button class="primary-action" type="submit">确认</button></div>
+    </form>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

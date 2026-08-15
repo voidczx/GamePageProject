@@ -1,0 +1,246 @@
+{
+  "schemaVersion": 1,
+  "goal": "《开拓者 - 正义之怒》构筑模拟器的可验证全量规则数据覆盖",
+  "generatedFrom": [
+    "data.js",
+    "expanded-data.js",
+    "choice-data.js",
+    "mythic-data.js",
+    "generated/wotr-2.7.0x.site.js",
+    "owlcat-runtime.js"
+  ],
+  "targetGameBuild": {
+    "version": "2.7.0x",
+    "baseVersion": "2.7.0",
+    "internalCommit": "eb82d8f2ec1cd0696dae5b17c53dd9a357f28674",
+    "platform": "steam-windows",
+    "steamAppId": "1184370",
+    "steamBuildId": "20212986",
+    "steamDepotId": "1184372",
+    "steamDepotManifestId": "6624263451234269485",
+    "sourceHashes": {
+      "versionInfoSha256": "4b4376fc0615ec7d8bb056b11da19d55a74fed18e0b08a60134701e9039791ee",
+      "steamManifestSemanticSha256": "f81abf2ef596123540024233f0bc73dad031e55b4b0ffdd7651790bf48710bf7"
+    },
+    "authoritativeSources": {
+      "blueprints": {
+        "relativePath": "blueprints.zip",
+        "size": 269394239,
+        "sha256": "be61c9b723ef06558da8d7cfc7f0c7ea869f60ba9952ebbbbd116cf681863ea5"
+      },
+      "cheatdata": {
+        "relativePath": "Bundles/cheatdata.json",
+        "size": 39819614,
+        "sha256": "30922709a5a860479b0bf208bee96d50261f64badc9b8557dbb114bec243f7b7"
+      },
+      "zhCN": {
+        "relativePath": "Wrath_Data/StreamingAssets/Localization/zhCN.json",
+        "size": 21481809,
+        "sha256": "3eb335714ba58bf784ada8093b34a5698177ecdd88e2598c5a04fae5e880773d"
+      }
+    },
+    "policy": "Version.info and the three authoritative data files must match their byte hashes; the Steam app manifest is verified by a stable semantic hash of app/build/installed-depot manifests so volatile fields such as LastPlayed do not invalidate the data snapshot."
+  },
+  "baseline": {
+    "abilities": 6,
+    "skills": 11,
+    "races": 15,
+    "playableRaces": 12,
+    "heritages": 49,
+    "backgrounds": 39,
+    "backgroundCategories": 9,
+    "alignments": 9,
+    "deities": 33,
+    "classes": 39,
+    "baseClasses": 26,
+    "prestigeClasses": 13,
+    "archetypes": 196,
+    "feats": 308,
+    "parameterizedFeats": 37,
+    "mythic": 119,
+    "mythicAbilities": 70,
+    "mythicFeats": 49,
+    "parameterizedMythic": 23,
+    "domains": 37,
+    "spells": 671,
+    "paths": 10,
+    "pathAbilities": 475,
+    "companions": 21,
+    "quests": 14,
+    "questNodes": 30,
+    "parameterTypes": 151,
+    "featureGroups": 463,
+    "classFeatureRules": 16,
+    "classesWithFeatureRules": 13,
+    "archetypesWithSpecificRules": 0,
+    "mythicPathRules": 10,
+    "sourceVerifiedFeats": 276,
+    "sourceVerifiedMythic": 115,
+    "sourceSelectionPools": 451,
+    "sourceSelectionDefinitions": 9658,
+    "sourceImportedDefinitions": 15283,
+    "sourceWeaponTypes": 145,
+    "sourceWeaponCategories": 78,
+    "sourceArmorTypes": 21,
+    "sourceShieldTypes": 4,
+    "installedWeaponOptions": 78,
+    "sourceParametrizedFeatures": 122,
+    "parameterizedFeatureDefinitions": 122,
+    "emptyParameterizedFeaturePools": 0,
+    "classFeatureDefinitions": 3029,
+    "pathFeatureDefinitions": 923,
+    "domainFeatureDefinitions": 276,
+    "activeAbilityDefinitions": 3755,
+    "localizedActiveAbilityDefinitions": 3605,
+    "classSourceProgressions": 39,
+    "archetypeSourcePatches": 196,
+    "mythicSourceProgressions": 10,
+    "domainsWithSourceProgressions": 37,
+    "spellsWithSourceMechanics": 671,
+    "nativeRequirementTypes": 28,
+    "modeledNativeRequirementTypes": 28,
+    "unmodeledNativeRequirementTypes": 0,
+    "mechanicsClosureVerified": 1
+  },
+  "authoritativeInventory": {
+    "blueprintCharacterClasses": 74,
+    "blueprintArchetypes": 213,
+    "blueprintFeatures": 9085,
+    "blueprintProgressions": 633,
+    "blueprintFeatureSelections": 460,
+    "blueprintParametrizedFeaturesInBasicFeatSelection": 14,
+    "blueprintSpellbooks": 62,
+    "blueprintSpellLists": 102,
+    "blueprintAbilities": 4456,
+    "blueprintActivatableAbilities": 967,
+    "characterClassRoots": 40,
+    "playableBaseClasses": 26,
+    "playablePrestigeClasses": 13,
+    "technicalClassRoots": 1,
+    "classReferencedArchetypes": 197,
+    "playableArchetypes": 196,
+    "npcOnlyReferencedArchetypes": ["Penta_UniqueBard"],
+    "characterMythicRoots": 14,
+    "playableMythicPaths": 10,
+    "technicalMythicRoots": 4,
+    "basicFeatDirectOptions": 276,
+    "basicFeatDirectFeatures": 241,
+    "basicFeatDirectSelections": 21,
+    "basicFeatDirectParametrizedFeatures": 14,
+    "mythicAbilityDirectOptions": 67,
+    "mythicFeatDirectOptions": 48,
+    "domainDirectOptions": 37,
+    "deityDirectOptions": 33,
+    "backgroundRootOptions": 11,
+    "backgroundStandardCategories": 8,
+    "backgroundStandardChoicesIncludingNone": 39,
+    "backgroundSpecialRestrictedChoices": 2,
+    "playableRaceRoots": 12,
+    "heritageSelectionRoots": 11,
+    "heritageDirectOptionsPlusHumanBase": 49,
+    "spellListMemberships": 4737,
+    "uniqueSpellAbilities": 671,
+    "blueprintWeaponTypes": 145,
+    "weaponCategories": 78,
+    "blueprintArmorTypes": 21,
+    "blueprintShieldTypes": 4
+  },
+  "knownParameterized": {
+    "feats": [
+      "armor-focus",
+      "elemental-fist",
+      "elemental-focus",
+      "fencing-grace",
+      "greater-elemental-focus",
+      "greater-spell-focus",
+      "greater-weapon-focus",
+      "greater-weapon-specialization",
+      "improved-critical",
+      "magical-tail",
+      "point-blank-master",
+      "slashing-grace",
+      "spell-focus",
+      "spell-specialization",
+      "weapon-focus",
+      "weapon-specialization"
+    ],
+    "mythic": [
+      "ascendant-element",
+      "extra-mythic-ability",
+      "impossible-domain",
+      "mythic-improved-critical",
+      "mythic-spell-focus",
+      "second-spirit"
+    ]
+  },
+  "allowedExternalReferences": {
+    "companionClassIds": ["dragon"],
+    "mythicStepGroups": ["dragon-feat"]
+  },
+  "claims": {
+    "catalog.feats": {
+      "status": "complete",
+      "reason": "2.7.0x BasicFeatSelection 的 276 个直接选项及所有嵌套选择池均由本机蓝图生成。"
+    },
+    "catalog.spells": {
+      "status": "complete",
+      "reason": "102 个法表、4737 条成员关系与 671 个唯一法术均来自本机蓝图。"
+    },
+    "catalog.racesAndHeritages": {
+      "status": "complete",
+      "reason": "49 个血统选项已按 2.7.0x 蓝图回放：可选与固定属性、授予/移除事实、免疫、抗性、条件效果及种族类法术能力均进入统一来源投影；可执行能力动作链与常驻数值分离。"
+    },
+    "catalog.backgrounds": {
+      "status": "complete",
+      "reason": "39 条出身已按安装版分组，并完整接入本职技能、武器/护甲擅长、属性替换、无条件数值与目标/状态条件效果；蓝图可执行能力单独作为运行时规则展示。"
+    },
+    "catalog.deitiesAndDomains": {
+      "status": "complete",
+      "reason": "33 位神祇、37 个领域、领域进度、领域能力与领域法表均从 2.7.0x 蓝图关联。"
+    },
+    "catalog.mythicCommon": {
+      "status": "complete",
+      "reason": "67 个通用神话能力和 48 个神话专长直接选项均由对应本机根选择导入。"
+    },
+    "catalog.activeAndSpellLikeAbilities": {
+      "status": "complete",
+      "reason": "已索引快照内全部 2993 个 BlueprintAbility 与 762 个 BlueprintActivatableAbility，并保留官方中文、机制和隐藏标志。"
+    },
+    "catalog.classPathDomainAbilities": {
+      "status": "complete",
+      "reason": "职业/原型、十条神话道途和领域的进度特性及嵌套选项都由来源 GUID、等级和选择池索引。"
+    },
+    "progression.baseClasses": {
+      "status": "complete",
+      "reason": "26 个基础职业与 13 个进阶职业均使用蓝图 Progression 生成升级槽和自动特性。"
+    },
+    "progression.archetypes": {
+      "status": "complete",
+      "reason": "196 个玩家可用原型均保留 AddFeatures、RemoveFeatures 与替换法术书补丁。"
+    },
+    "progression.mythicPaths": {
+      "status": "complete",
+      "reason": "10 条可玩道途的逐阶选择、重复槽位、自动授予和晚期转道均由本机神话职业进度生成。"
+    },
+    "parameters.choicePools": {
+      "status": "complete",
+      "reason": "451 个选择池和 122 个参数化特性均已接入；WeaponCategory、SpellSchool、FeatureSelection、SpellSpecialization 与 LearnSpell 参数池非空。"
+    },
+    "parameters.weaponCatalog": {
+      "status": "complete",
+      "reason": "从当前安装版 145 个 BlueprintWeaponType 提取全部 78 个唯一 WeaponCategory，并保留官方中文、攻击类型、单双手、伤害形态和战士武器组供参数过滤。"
+    },
+    "mechanics.nativePrerequisites": {
+      "status": "complete",
+      "reason": "蓝图出现的 28 类原生前置组件均已接入；PrerequisiteEtude 按当前安装程序集的 IsPlaying / NotPlaying 实现校验，并由存档显式记录剧情状态假设。"
+    },
+    "mechanics.structuredEffects": {
+      "status": "complete",
+      "reason": "统一效果投影已覆盖 3597 个唯一目录根与 9658 个安装版机制定义，未分类组件为 0；无条件数值按原生加值类型叠加，装备/目标/地形等条件效果与施法、触发器、动作链分别展示，运行时规则不再误计入常驻总值。"
+    },
+    "quests.companionArcs": {
+      "status": "partial",
+      "reason": "14 条任务、30 个节点是摘要集，尚未与全触发条件和全部选择后果逐项对照。"
+    }
+  }
+}

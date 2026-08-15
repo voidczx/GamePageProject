@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/wotr/owlcat-snapshot.schema.json",
+  "title": "Normalized Owlcat blueprint snapshot",
+  "type": "object",
+  "required": [
+    "schemaVersion", "gameId", "gameVersion", "steamBuild", "provenance", "hashes", "counts",
+    "rootCatalog", "guidIndex", "definitions", "choicePools", "selectionGraphs", "progressions",
+    "archetypePatches", "spellLists", "spellbooks", "spellsTables", "statProgressions", "parametrizedFeatures", "diagnostics"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "gameId": { "type": "string" },
+    "gameVersion": { "type": "string" },
+    "steamBuild": { "type": "string" },
+    "provenance": {
+      "type": "object",
+      "required": ["importer", "versionInfo", "sources"],
+      "properties": {
+        "sources": {
+          "type": "array",
+          "minItems": 4,
+          "items": {
+            "type": "object",
+            "required": ["kind", "path", "bytes", "sha256"]
+          }
+        }
+      }
+    },
+    "hashes": {
+      "type": "object",
+      "required": ["dataSha256", "snapshotSha256"]
+    },
+    "counts": { "type": "object" },
+    "rootCatalog": { "type": "object" },
+    "guidIndex": { "type": "array" },
+    "definitions": {
+      "type": "object",
+      "required": ["abilities", "classes", "domains", "feats", "mythic", "spells"]
+    },
+    "choicePools": { "type": "array" },
+    "selectionGraphs": { "type": "array" },
+    "progressions": { "type": "array" },
+    "archetypePatches": { "type": "array" },
+    "spellLists": { "type": "array" },
+    "spellbooks": { "type": "array" },
+    "spellsTables": { "type": "array" },
+    "statProgressions": { "type": "array" },
+    "parametrizedFeatures": { "type": "array" },
+    "diagnostics": { "type": "object" }
+  }
+}

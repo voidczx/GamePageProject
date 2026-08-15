@@ -228,6 +228,7 @@ h1 {
 
 .guide-card:nth-child(2) .guide-kicker span:first-child { color: var(--gold); }
 .guide-card:nth-child(3) .guide-kicker span:first-child { color: #f0d84c; }
+.guide-card:nth-child(4) .guide-kicker span:first-child { color: #c9a45c; }
 
 .guide-body h3 { margin: 12px 0 2px; font-family: Georgia, "Noto Serif SC", serif; font-size: 25px; font-weight: 500; }
 

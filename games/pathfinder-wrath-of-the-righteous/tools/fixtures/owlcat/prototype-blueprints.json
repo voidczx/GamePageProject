@@ -1,0 +1,49 @@
+{
+  "parent": {
+    "AssetId": "11111111111111111111111111111111",
+    "Data": {
+      "$type": "parent, BlueprintParametrizedFeature",
+      "PrototypeLink": "",
+      "m_Overrides": [],
+      "m_DisplayName": { "m_Key": "parent.name" },
+      "ParameterType": "SpellSpecialization",
+      "BlueprintParameterVariants": ["!bp_33333333333333333333333333333333"],
+      "Groups": ["Feat"],
+      "Components": [
+        {
+          "$type": "parent, PrerequisiteStatValue",
+          "name": "$PrerequisiteStatValue$keep",
+          "Stat": "Strength",
+          "Value": 13
+        },
+        {
+          "$type": "parent, AddFeatureOnApply",
+          "name": "$AddFeatureOnApply$remove",
+          "m_Feature": "!bp_44444444444444444444444444444444"
+        }
+      ]
+    }
+  },
+  "child": {
+    "AssetId": "22222222222222222222222222222222",
+    "Data": {
+      "$type": "child, BlueprintParametrizedFeature",
+      "PrototypeLink": "11111111111111111111111111111111",
+      "m_Overrides": ["Groups", "$AddFeatureOnApply$remove", "$PrerequisiteFeature$add"],
+      "Groups": [],
+      "Components": [
+        {
+          "$type": "child, PrerequisiteStatValue",
+          "name": "$PrerequisiteStatValue$keep(Clone)",
+          "Stat": "Strength",
+          "Value": 13
+        },
+        {
+          "$type": "child, PrerequisiteFeature",
+          "name": "$PrerequisiteFeature$add",
+          "m_Feature": "!bp_55555555555555555555555555555555"
+        }
+      ]
+    }
+  }
+}
