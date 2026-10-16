@@ -1,0 +1,28 @@
+{
+  "name": "Cyberware Loadouts",
+  "version": "0.3.1",
+  "game": "Cyberpunk 2077",
+  "testedGameVersion": "2.31",
+  "verification": {
+    "baseFinalRedscriptsSha256": "2119046f3f3466206d8a16a4803b0ef0f3c90926ab689f9abbd5b8e42e28ee86",
+    "redscriptCompilerSha256": "da2c0de580173010c907a05fdd2f3cd2430d6e62bf748339d65060118ae32edd",
+    "redscriptPackage": "redscript-1511-0-5-31-1757113888"
+  },
+  "installRoot": "game",
+  "requiredDependencies": [
+    {
+      "name": "redscript",
+      "minimumVersion": "0.5.31"
+    }
+  ],
+  "optionalDependencies": [
+    {
+      "name": "RipperDeck",
+      "testedVersion": "1.1.0"
+    },
+    {
+      "name": "Cyberware-EX",
+      "testedVersion": "1.5.6"
+    }
+  ]
+}
